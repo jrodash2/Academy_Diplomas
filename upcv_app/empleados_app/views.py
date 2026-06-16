@@ -262,70 +262,22 @@ from django.utils.timezone import now
 
 @login_required
 def dahsboard(request):
-    # Empleados activos/inactivos
-    total_activos = Empleado.objects.filter(activo=True).count()
-    total_inactivos = Empleado.objects.filter(activo=False).count()
+    grupos = set(request.user.groups.values_list('name', flat=True))
+    puede_diplomas = request.user.is_superuser or bool({'Diplomas', 'Gestor_Diplomas', 'Admin_diplomas'} & grupos)
 
-    # Contratos vigentes y no vigentes
-    fecha_actual = now()
-    contratos_vigentes = Contrato.objects.filter(
-        activo=True,
-        fecha_inicio__lte=fecha_actual,
-        fecha_vencimiento__gte=fecha_actual
-    ).count()
+    if puede_diplomas:
+        return redirect('diplomas:diplomas_dahsboard')
 
-    contratos_no_vigentes = Contrato.objects.exclude(
-        activo=True,
-        fecha_inicio__lte=fecha_actual,
-        fecha_vencimiento__gte=fecha_actual
-    ).count()
-
-    # Contratos por año
-    contratos_por_anio = (
-        Contrato.objects.annotate(anio=ExtractYear('fecha_inicio'))
-        .values('anio')
-        .annotate(total=Count('id'))
-        .order_by('anio')
-    )
-
-    # Empleados por sede (usando contrato.sede)
-    empleados_por_sede = (
-    Contrato.objects
-    .filter(activo=True, sede__isnull=False)
-    .values('sede__nombre')
-    .annotate(total=Count('empleado', distinct=True))
-    .order_by('sede__nombre')
-)
-
-
-    print("Empleados por sede:", list(empleados_por_sede))  # <-- para debug
-
-
-    # Últimos contratos
-    ultimos_contratos = (
-        Contrato.objects.select_related('empleado')
-        .order_by('-created_at')[:4]
-    )
-
-    context = {
-        'datos_empleados': {
-            'activos': total_activos,
-            'inactivos': total_inactivos,
-            'contratos_vigentes': contratos_vigentes,
-            'contratos_no_vigentes': contratos_no_vigentes,
-        },
-        'contratos_por_anio': list(contratos_por_anio),
-        'empleados_por_sede': list(empleados_por_sede),
-        'ultimos_contratos': ultimos_contratos,
-    }
-
-    return render(request, 'empleados/dahsboard.html', context)
-
+    return render(request, 'empleados/dahsboard.html', {
+        'modulo_activo': 'Diplomas',
+        'puede_diplomas': False,
+    })
 
 
 def signout(request):
     logout(request)
     return redirect('empleados:signin')
+
 
 def signin(request):
     if request.method == 'GET':
@@ -345,23 +297,11 @@ def signin(request):
 
     auth_login(request, user)
 
-    grupos = list(user.groups.values_list('name', flat=True))
-
-    if 'Admin_gafetes' in grupos:
-        return redirect('empleados:dahsboard')
-    if 'Admin_tickets' in grupos:
-        return redirect('tickets:dashboard')
-    if 'tecnico' in grupos:
-        return redirect('tickets:tickets_dahsboard')
-    if 'Diplomas' in grupos or 'Gestor_Diplomas' in grupos:
+    grupos = set(user.groups.values_list('name', flat=True))
+    if user.is_superuser or {'Diplomas', 'Gestor_Diplomas', 'Admin_diplomas'} & grupos:
         return redirect('diplomas:diplomas_dahsboard')
-    if any(grupo in grupos for grupo in ['Administrador', 'PRESUPUESTO', 'COMPRAS']):
-        return redirect('scompras:dahsboard')
-    if 'scompras' in grupos:
-        return redirect('scompras:dashboard_usuario')
-    if 'analista' in grupos:
-        return redirect('scompras:analista_dashboard')
 
+    messages.error(request, 'Su usuario no tiene permisos para acceder al módulo de Diplomas.')
     return redirect('empleados:dahsboard')
 
 from django.http import JsonResponse
