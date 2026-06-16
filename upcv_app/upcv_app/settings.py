@@ -40,10 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'empleados_app',
-    'tickets_app.apps.TicketsAppConfig',
     'diplomas_app',
-    'scompras_app',
-    'app_backup',
 
 
 ]
@@ -71,11 +68,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'tickets_app.context_processors.frase_del_dia',  # Agregar el context processor personalizado
-                'scompras_app.context_processors.grupo_usuario',
-                'scompras_app.context_processors.datos_institucion',
-                'scompras_app.context_processors.permisos_configuracion',
-            
             ],
         },
     },
@@ -113,7 +105,8 @@ DATABASES = {
 },
       }
 
-DATABASE_ROUTERS = ['tickets_app.db_router.TicketsRouter']
+# Módulos externos a Diplomas aislados: sin router de tickets activo.
+DATABASE_ROUTERS = []
 
 
 # Password validation
@@ -175,7 +168,7 @@ STATICFILES_DIRS = [
 
 
 # Configuración de correo electrónico
-EMAIL_BACKEND = 'tickets_app.email_backend.CustomEmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

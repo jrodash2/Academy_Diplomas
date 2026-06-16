@@ -9,12 +9,13 @@ from .models import UsuarioUbicacionDiploma
 
 GRUPO_DIPLOMAS = "Diplomas"
 GRUPO_GESTOR_DIPLOMAS = "Gestor_Diplomas"
+GRUPO_ADMIN_DIPLOMAS = "Admin_diplomas"
 
 User = get_user_model()
 
 
 def is_diplomas_admin(user):
-    return bool(user and user.is_authenticated and (user.is_superuser or user.groups.filter(name=GRUPO_DIPLOMAS).exists()))
+    return bool(user and user.is_authenticated and (user.is_superuser or user.groups.filter(name__in=[GRUPO_DIPLOMAS, GRUPO_ADMIN_DIPLOMAS]).exists()))
 
 
 def is_diplomas_manager(user):
@@ -78,7 +79,7 @@ def diplomas_access_required(view_func):
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect("signin")
+            return redirect("empleados:signin")
         if not can_access_diplomas(request.user):
             raise PermissionDenied("No tiene permisos para acceder al módulo de Diplomas.")
         scope = build_diplomas_scope(request.user)

@@ -19,14 +19,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from empleados_app import views as empleados_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     
-    path('empleados/', include('empleados_app.urls')),  # Incluye las URLs de tu aplicación
-    path('tickets/', include('tickets_app.urls')),  # Incluye las URLs de tu aplicación
-    path('scompras/', include('scompras_app.urls')),
+    path('empleados/', include('empleados_app.urls')),
     path('diplomas/', include('diplomas_app.urls', namespace='diplomas')),
-
-    path('', include('empleados_app.urls')),
+    # Alias públicos esperados para autenticación.
+    path('login/', empleados_views.signin, name='login'),
+    path('signin/', empleados_views.signin, name='signin'),
+    path('logout/', empleados_views.signout, name='logout'),
+    path('', empleados_views.home, name='home'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

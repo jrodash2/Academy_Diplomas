@@ -153,7 +153,7 @@
                 </div>
                 <ul class="profile-dropdown onhover-show-div">
                   
-                  <li><a class="btn btn-pill btn-outline-primary btn-sm" href="/logout">Salir</a></li>
+                  <li><a class="btn btn-pill btn-outline-primary btn-sm" href="{% url 'empleados:logout' %}">Salir</a></li>
                 </ul>
               </li>
             </ul>
@@ -180,64 +180,18 @@
           </div>
           <div class="logo-icon-wrapper"><a href="index.html"><img class="img-fluid" src="../assets/images/logo/logo-icon.png" alt=""></a></div>
           <nav class="sidebar-main">
-            <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
             <div id="sidebar-menu">
               <ul class="sidebar-links" id="simple-bar">
-                <li class="back-btn"><a href="index.html"><img class="img-fluid" src="../assets/images/logo/logo-icon.png" alt=""></a>
-                  <div class="mobile-back text-end"> <span>Back </span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
-                </li>
-                <li class="pin-title sidebar-main-title">
-                  <div> 
-                    <h6></h6>
-                  </div>
-                </li>
-                <li class="sidebar-main-title">
-                  <div>
-                    <h6 >Sistema Gafetes</h6>
-                  </div>
-                </li>
+                <li class="sidebar-main-title"><div><h6>Diplomas</h6></div></li>
                 {% if user.is_authenticated %}
-                              <li class="sidebar-list"><i class="fa fa-thumb-tack"> </i><a class="sidebar-link " href="{% url 'empleados:dahsboard' %}">
-                <svg class="stroke-icon">
-                  <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
-                </svg>
-                <svg class="fill-icon">
-                  <use href="{% url 'empleados:dahsboard' %}"></use>
-                </svg><span>Dashboard</span></a>
-              
-            </li>
-                <li class="sidebar-list"><i class="fa fa-thumb-tack"> </i><a class="sidebar-link sidebar-title" href="#">
-                    <svg class="stroke-icon">
-                      <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
-                    </svg>
-                    <svg class="fill-icon">
-                      <use href="../assets/svg/icon-sprite.svg#fill-home"></use>
-                    </svg><span>Empleados</span></a>
-                  <ul class="sidebar-submenu">
-                    <li><a href="{% url 'empleados:crear_empleado' %}">Crear Empleados</a></li>
-                    <li><a href="{% url 'empleados:empleado_credencial' %}">Contratos Vigentes</a></li>
-                    <li><a href="{% url 'empleados:empleado_lista' %}">Contratos Vencidos</a></li>
-                    {% comment %} <li><a href="#"></a></li>
-                    <li><a href="#"></a></li> {% endcomment %}
-                  </ul>
-                </li>
- 
-
-                <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title" href="#">
-                  <svg class="stroke-icon">
-                    <use href="../assets/svg/icon-sprite.svg#stroke-gallery"></use>
-                  </svg>
-                  <svg class="fill-icon">
-                    <use href="../assets/svg/icon-sprite.svg#fill-gallery"></use>
-                  </svg><span>Configuración</span></a>
-                <ul class="sidebar-submenu">
-              
-                  <li><a href="{% url 'empleados:configuracion_general' %}">Config.General</a></li>
-                </ul>
-              </li>
-              {% endif %}
-                              </ul>
-              <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
+                <li class="sidebar-list"><a class="sidebar-link" href="{% url 'empleados:dahsboard' %}"><span>Inicio / Dashboard</span></a></li>
+                <li class="sidebar-list"><a class="sidebar-link" href="{% url 'diplomas:diplomas_dahsboard' %}"><span>Diplomas</span></a></li>
+                {% if user.is_superuser %}
+                <li class="sidebar-list"><a class="sidebar-link" href="{% url 'admin:auth_user_changelist' %}"><span>Usuarios / Roles</span></a></li>
+                {% endif %}
+                <li class="sidebar-list"><a class="sidebar-link" href="{% url 'empleados:logout' %}"><span>Cerrar sesión</span></a></li>
+                {% endif %}
+              </ul>
             </div>
           </nav>
         </div>
