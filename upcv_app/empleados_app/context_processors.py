@@ -51,13 +51,13 @@ def datos_institucion(request):
     }
 
 from django.conf import settings
-from scompras_app.models_empleados import Empleado
 
 def empleado_context(request):
     if not request.user.is_authenticated:
         return {}
 
-    empleado = Empleado.objects.using('tickets_db').filter(user=request.user).first()
+    # Fase 1: scompras_app no está activo; no importar modelos de módulos candidatos a eliminación.
+    empleado = None
 
     foto_url = None
     if empleado and empleado.imagen:
