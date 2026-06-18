@@ -49,28 +49,6 @@ class Empleado(models.Model):
 
 
 
-def buscar_empleado_dpi(request):
-    dpi = request.GET.get("dpi")
-    if not dpi:
-        return JsonResponse({"error": "No DPI"}, status=400)
-
-    try:
-        emp = Empleado.objects.using('tickets_db').get(dpi=dpi)
-        return JsonResponse({
-            "nombres": emp.nombres,
-            "apellidos": emp.apellidos,
-            "imagen": emp.imagen.url if emp.imagen else None,
-            "username": generar_username(emp.nombres, emp.apellidos),
-            "email": "",
-        })
-    except Empleado.DoesNotExist:
-        return JsonResponse({"error": "Empleado no encontrado"}, status=404)
-    
-
-def generar_username(nombre, apellido):
-    # Primera letra del nombre + apellido sin espacios
-    return (nombre.split()[0][0] + apellido.replace(" ", "")).lower()
-
 class DatosBasicosEmpleado(models.Model):
     empleado = models.OneToOneField(
         Empleado,

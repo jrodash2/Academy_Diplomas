@@ -95,17 +95,8 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',  # O el puerto que hayas configurado
     },
-    'tickets_db': {  # Nueva conexión de solo lectura
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Tickets',
-        'USER': 'postgres',
-        'PASSWORD': 'Jrodash2#',
-        'HOST': 'localhost',
-        'PORT': '5432',
-},
-      }
+}
 
-# Módulos externos a Diplomas aislados: sin router de tickets activo.
 DATABASE_ROUTERS = []
 
 
