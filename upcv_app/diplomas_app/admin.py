@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from .models import Curso, CursoEmpleado, Diploma, DisenoDiploma, Firma, UbicacionDiploma
+from .models import Curso, CursoEmpleado, Diploma, DisenoDiploma, Firma, FraseMotivacional, UbicacionDiploma
+
+
+@admin.register(FraseMotivacional)
+class FraseMotivacionalAdmin(admin.ModelAdmin):
+    list_display = ("personaje", "frase")
+    search_fields = ("personaje", "frase")
 
 
 @admin.register(UbicacionDiploma)
