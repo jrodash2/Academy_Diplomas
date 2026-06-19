@@ -2,7 +2,6 @@ from django.conf import settings
 from django.db import models, transaction
 from django.utils import timezone
 
-from empleados_app.models import Empleado
 
 
 INSTITUTION_CODE = "UPCV"
@@ -23,6 +22,14 @@ def default_location_abbreviation(name):
         return normalized_initials
     compact = normalize_location_abbreviation("".join(words))
     return compact or "GENERAL"
+
+
+class FraseMotivacional(models.Model):
+    frase = models.CharField(max_length=500)
+    personaje = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.personaje}: {self.frase}'
 
 
 class UbicacionDiploma(models.Model):
@@ -137,12 +144,15 @@ class Curso(models.Model):
 
 class CursoEmpleado(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name="participantes")
-    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE, related_name="cursos", null=True, blank=True)
-    participante_dpi = models.CharField(max_length=15, blank=True, default="")
-    participante_nombre = models.CharField(max_length=200, blank=True, default="")
+    empleado = models.ForeignKey("empleados_app.Empleado", on_delete=models.SET_NULL, related_name="cursos", null=True, blank=True)
+    participante_dpi = models.CharField(max_length=20, blank=True, default="")
+    participante_nombre = models.CharField(max_length=150, blank=True, default="")
+    participante_apellidos = models.CharField(max_length=150, blank=True, default="")
     participante_foto = models.ImageField(upload_to="diplomas/participantes/", null=True, blank=True)
     participante_correo = models.EmailField(blank=True, default="")
     participante_telefono = models.CharField(max_length=30, blank=True, default="")
+    participante_institucion = models.CharField(max_length=200, blank=True, default="")
+    participante_cargo = models.CharField(max_length=150, blank=True, default="")
     observaciones = models.TextField(blank=True, default="")
     fecha_asignacion = models.DateTimeField(default=timezone.now)
     correo_inscripcion_enviado_en = models.DateTimeField(blank=True, null=True)
@@ -151,30 +161,31 @@ class CursoEmpleado(models.Model):
     ultimo_error_correo_finalizacion = models.TextField(blank=True, default="")
 
     class Meta:
-        unique_together = ('curso', 'empleado')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['curso', 'participante_dpi'],
+                condition=~models.Q(participante_dpi=''),
+                name='unique_diploma_participant_dpi_per_course',
+            ),
+        ]
         verbose_name = "Participante"
         verbose_name_plural = "Participantes"
 
     def __str__(self):
-        return f"{self.nombre_participante or self.empleado or 'Participante'} en {self.curso}"
+        return f"{self.nombre_participante or 'Participante'} en {self.curso}"
 
     @property
     def nombre_participante(self):
-        if self.participante_nombre:
-            return self.participante_nombre
-        if self.empleado_id:
-            return f"{self.empleado.nombres} {self.empleado.apellidos}".strip()
-        return ""
+        nombre = " ".join(part for part in [self.participante_nombre, self.participante_apellidos] if part).strip()
+        return nombre
 
     @property
     def dpi_participante(self):
-        if self.participante_dpi:
-            return self.participante_dpi
-        return getattr(self.empleado, "dpi", "")
+        return self.participante_dpi
 
     @property
     def foto_participante_url(self):
-        foto = self.participante_foto or getattr(self.empleado, "imagen", None)
+        foto = self.participante_foto
         try:
             return foto.url if foto else ""
         except Exception:
@@ -182,17 +193,11 @@ class CursoEmpleado(models.Model):
 
     @property
     def correo_participante(self):
-        if self.participante_correo:
-            return self.participante_correo
-        datos_basicos = getattr(self.empleado, "datos_basicos", None)
-        return getattr(datos_basicos, "correo_institucional", "") or ""
+        return self.participante_correo
 
     @property
     def telefono_participante(self):
-        if self.participante_telefono:
-            return self.participante_telefono
-        datos_basicos = getattr(self.empleado, "datos_basicos", None)
-        return getattr(datos_basicos, "telefono_personal", "") or ""
+        return self.participante_telefono
 
     @property
     def observaciones_participante(self):
@@ -206,7 +211,7 @@ class Diploma(models.Model):
     generado_en = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Diploma de {self.curso_empleado.nombre_participante or self.curso_empleado.empleado} - {self.curso_empleado.curso}"
+        return f"Diploma de {self.curso_empleado.nombre_participante or 'Participante'} - {self.curso_empleado.curso}"
 
     @classmethod
     def build_numero_diploma(cls, curso_empleado, year=None):

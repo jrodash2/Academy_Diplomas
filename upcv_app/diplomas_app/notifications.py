@@ -14,8 +14,6 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 
-from empleados_app.models import ConfiguracionGeneral
-
 from .models import CursoEmpleado
 
 logger = logging.getLogger(__name__)
@@ -23,8 +21,7 @@ logger = logging.getLogger(__name__)
 
 def _build_course_context(participante, request=None):
     curso = participante.curso
-    configuracion = ConfiguracionGeneral.objects.first()
-    institucion = getattr(configuracion, "nombre_institucion", "UPCV") or "UPCV"
+    institucion = "UPCV"
     ubicacion = getattr(curso.ubicacion, "nombre", "Sin ubicación") if curso else "Sin ubicación"
 
     diploma_query = urlencode(

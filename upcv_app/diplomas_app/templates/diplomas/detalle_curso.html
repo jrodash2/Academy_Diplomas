@@ -133,7 +133,7 @@
                 <div>
                   <span class="badge bg-light text-primary mb-2">Registro público</span>
                   <h5 class="mb-2 text-white">Inscripción de participantes</h5>
-                  <p class="small mb-0" style="color: rgba(255,255,255,.82);">Formulario público para localizar al participante por DPI y registrarlo al curso.</p>
+                  <p class="small mb-0" style="color: rgba(255,255,255,.82);">Formulario público para que el participante escriba manualmente sus datos y se registre al curso.</p>
                 </div>
                 <i class="fa fa-user-plus fa-2x" aria-hidden="true" style="opacity:.35;"></i>
               </div>
@@ -154,7 +154,7 @@
                 <div>
                   <span class="badge bg-primary-subtle text-primary mb-2">Descarga pública</span>
                   <h5 class="mb-2">Consulta y descarga de diploma</h5>
-                  <p class="text-muted small mb-0">Enlace para que el participante valide su DPI, confirme que pertenece al curso y abra su diploma.</p>
+                  <p class="text-muted small mb-0">Enlace para que el participante valide una matrícula guardada en Diplomas y abra su diploma.</p>
                 </div>
                 <i class="fa fa-download fa-2x text-primary" aria-hidden="true" style="opacity:.35;"></i>
               </div>
@@ -213,6 +213,8 @@
                 <th>DPI</th>
                 <th>Correo</th>
                 <th>Teléfono</th>
+                <th>Institución</th>
+                <th>Cargo</th>
                 <th>Observaciones</th>
                 <th>Fecha Asignación</th>
                 <th>Acciones</th>
@@ -235,6 +237,8 @@
                 <td>{{ p.dpi_participante }}</td>
                 <td>{{ p.correo_participante|default:"-" }}</td>
                 <td>{{ p.telefono_participante|default:"-" }}</td>
+                <td>{{ p.participante_institucion|default:"-" }}</td>
+                <td>{{ p.participante_cargo|default:"-" }}</td>
                 <td>{{ p.observaciones_participante|default:"-" }}</td>
                 <td>{{ p.fecha_asignacion|date:"d/m/Y H:i" }}</td>
 
@@ -281,6 +285,8 @@
                 <th>DPI</th>
                 <th>Correo</th>
                 <th>Teléfono</th>
+                <th>Institución</th>
+                <th>Cargo</th>
                 <th>Observaciones</th>
                 <th>Fecha Asignación</th>
                 <th>Acciones</th>
@@ -317,12 +323,24 @@
             {{ item.form.participante_nombre }}
           </div>
           <div class="mb-2">
+            <label for="{{ item.form.participante_apellidos.id_for_label }}" class="form-label">{{ item.form.participante_apellidos.label }}</label>
+            {{ item.form.participante_apellidos }}
+          </div>
+          <div class="mb-2">
             <label for="{{ item.form.participante_correo.id_for_label }}" class="form-label">{{ item.form.participante_correo.label }}</label>
             {{ item.form.participante_correo }}
           </div>
           <div class="mb-2">
             <label for="{{ item.form.participante_telefono.id_for_label }}" class="form-label">{{ item.form.participante_telefono.label }}</label>
             {{ item.form.participante_telefono }}
+          </div>
+          <div class="mb-2">
+            <label for="{{ item.form.participante_institucion.id_for_label }}" class="form-label">{{ item.form.participante_institucion.label }}</label>
+            {{ item.form.participante_institucion }}
+          </div>
+          <div class="mb-2">
+            <label for="{{ item.form.participante_cargo.id_for_label }}" class="form-label">{{ item.form.participante_cargo.label }}</label>
+            {{ item.form.participante_cargo }}
           </div>
           <div class="mb-2">
             <label for="{{ item.form.observaciones.id_for_label }}" class="form-label">{{ item.form.observaciones.label }}</label>
@@ -345,123 +363,76 @@
 
 
 <!-- ========================= -->
-<!--   MODAL AGREGAR EMPLEADO  -->
+<!--   MODAL AGREGAR PARTICIPANTE MANUAL  -->
 <!-- ========================= -->
 <div class="modal fade" id="modalAgregarEmpleado" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content dark-sign-up">
-
       <div class="modal-body social-profile text-start p-4">
-
         <div class="title-wrapper pb-3 modal-heading text-center">
-          <h5 class="theme-name mb-0">Agregar Participante</h5>
-          <p>Use la opción rápida por DPI si el participante ya existe o la opción manual si necesita registrarlo completo.</p>
+          <h5 class="theme-name mb-0">Matricular participante</h5>
+          <p>Complete manualmente los datos del participante. No se consultará información del módulo Empleados.</p>
         </div>
 
         <div class="overflow-hidden text-center mb-3">
           <img class="img-fluid small-logo" src="{% static 'assets/images/logo/logo.png' %}" alt="">
         </div>
 
-        <ul class="nav nav-pills nav-fill mb-3" id="matriculaTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#matriculaRapidaPane" type="button" role="tab">
-              Existente por DPI
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#matriculaManualPane" type="button" role="tab">
-              Matrícula manual
-            </button>
-          </li>
-        </ul>
-
-        <div class="tab-content">
-          {% if not can_enroll %}
-          <div class="alert alert-warning mb-3">
-            {{ enrollment_message }}
-          </div>
-          {% endif %}
-          <div class="tab-pane fade show active" id="matriculaRapidaPane" role="tabpanel">
-            <div class="alert alert-light border small py-2">
-              <strong>Opción rápida:</strong> escriba el DPI, espere el autocompletado y agregue al participante si ya existe.
-            </div>
-            <form method="POST" action="{% url 'diplomas:agregar_empleado_detalle' curso.id %}">
-              {% csrf_token %}
-              <input type="hidden" name="enrollment_mode" value="quick">
-              {{ matricula_rapida_form.curso }}
-              {{ matricula_rapida_form.empleado_id }}
-
-              <div class="mb-2">
-                <label for="{{ matricula_rapida_form.dpi.id_for_label }}" class="form-label">{{ matricula_rapida_form.dpi.label }}</label>
-                {{ matricula_rapida_form.dpi }}
-                <small class="text-muted">{{ matricula_rapida_form.dpi.help_text }}</small>
-              </div>
-
-              <div class="mb-2">
-                <label for="{{ matricula_rapida_form.nombre_completo.id_for_label }}" class="form-label">{{ matricula_rapida_form.nombre_completo.label }}</label>
-                {{ matricula_rapida_form.nombre_completo }}
-              </div>
-
-              <div class="small mb-3" id="quickLookupStatus"></div>
-
-              <button class="btn btn-primary w-100" id="quickAddButton" {% if not can_enroll %}disabled{% endif %}>Agregar participante existente</button>
-            </form>
-          </div>
-
-          <div class="tab-pane fade" id="matriculaManualPane" role="tabpanel">
-            <div class="alert alert-light border small py-2">
-              <strong>Matrícula manual:</strong> use esta opción cuando el participante no exista o necesite guardar información adicional.
-            </div>
-            <form method="POST" action="{% url 'diplomas:agregar_empleado_detalle' curso.id %}" enctype="multipart/form-data">
-              {% csrf_token %}
-              <input type="hidden" name="enrollment_mode" value="manual">
-              {{ matricula_manual_form.curso }}
-
-              <div class="mb-2">
-                <label for="{{ matricula_manual_form.participante_dpi.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_dpi.label }}</label>
-                {{ matricula_manual_form.participante_dpi }}
-                <small class="text-muted">{{ matricula_manual_form.participante_dpi.help_text }}</small>
-              </div>
-
-              <div class="mb-2">
-                <label for="{{ matricula_manual_form.participante_nombre.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_nombre.label }}</label>
-                {{ matricula_manual_form.participante_nombre }}
-                <small class="text-muted">{{ matricula_manual_form.participante_nombre.help_text }}</small>
-              </div>
-
-              <div class="mb-2">
-                <label for="{{ matricula_manual_form.participante_foto.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_foto.label }}</label>
-                {{ matricula_manual_form.participante_foto }}
-                <small class="text-muted">{{ matricula_manual_form.participante_foto.help_text }}</small>
-              </div>
-
-              <div class="mb-2">
-                <label for="{{ matricula_manual_form.participante_correo.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_correo.label }}</label>
-                {{ matricula_manual_form.participante_correo }}
-                <small class="text-muted">{{ matricula_manual_form.participante_correo.help_text }}</small>
-              </div>
-
-              <div class="mb-2">
-                <label for="{{ matricula_manual_form.participante_telefono.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_telefono.label }}</label>
-                {{ matricula_manual_form.participante_telefono }}
-                <small class="text-muted">{{ matricula_manual_form.participante_telefono.help_text }}</small>
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ matricula_manual_form.observaciones.id_for_label }}" class="form-label">{{ matricula_manual_form.observaciones.label }}</label>
-                {{ matricula_manual_form.observaciones }}
-                <small class="text-muted">{{ matricula_manual_form.observaciones.help_text }}</small>
-              </div>
-
-              <div class="alert alert-light border small py-2">
-                <strong>Obligatorios:</strong> DPI y Nombre del participante.<br>
-                <strong>Opcionales:</strong> Fotografía, Correo, Teléfono y Observaciones.
-              </div>
-              <button class="btn btn-outline-primary w-100" {% if not can_enroll %}disabled{% endif %}>Guardar matrícula manual</button>
-            </form>
-          </div>
+        {% if not can_enroll %}
+        <div class="alert alert-warning mb-3">
+          {{ enrollment_message }}
         </div>
+        {% endif %}
 
+        <form method="POST" action="{% url 'diplomas:agregar_empleado_detalle' curso.id %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ matricula_manual_form.curso }}
+
+          <div class="row g-2">
+            <div class="col-md-6 mb-2">
+              <label for="{{ matricula_manual_form.participante_nombre.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_nombre.label }}</label>
+              {{ matricula_manual_form.participante_nombre }}
+            </div>
+            <div class="col-md-6 mb-2">
+              <label for="{{ matricula_manual_form.participante_apellidos.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_apellidos.label }}</label>
+              {{ matricula_manual_form.participante_apellidos }}
+            </div>
+            <div class="col-md-6 mb-2">
+              <label for="{{ matricula_manual_form.participante_dpi.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_dpi.label }}</label>
+              {{ matricula_manual_form.participante_dpi }}
+            </div>
+            <div class="col-md-6 mb-2">
+              <label for="{{ matricula_manual_form.participante_correo.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_correo.label }}</label>
+              {{ matricula_manual_form.participante_correo }}
+            </div>
+            <div class="col-md-6 mb-2">
+              <label for="{{ matricula_manual_form.participante_telefono.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_telefono.label }}</label>
+              {{ matricula_manual_form.participante_telefono }}
+            </div>
+            <div class="col-md-6 mb-2">
+              <label for="{{ matricula_manual_form.participante_institucion.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_institucion.label }}</label>
+              {{ matricula_manual_form.participante_institucion }}
+            </div>
+            <div class="col-md-6 mb-2">
+              <label for="{{ matricula_manual_form.participante_cargo.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_cargo.label }}</label>
+              {{ matricula_manual_form.participante_cargo }}
+            </div>
+            <div class="col-md-6 mb-2">
+              <label for="{{ matricula_manual_form.participante_foto.id_for_label }}" class="form-label">{{ matricula_manual_form.participante_foto.label }}</label>
+              {{ matricula_manual_form.participante_foto }}
+            </div>
+            <div class="col-12 mb-3">
+              <label for="{{ matricula_manual_form.observaciones.id_for_label }}" class="form-label">{{ matricula_manual_form.observaciones.label }}</label>
+              {{ matricula_manual_form.observaciones }}
+            </div>
+          </div>
+
+          <div class="alert alert-light border small py-2">
+            <strong>Obligatorio:</strong> nombres del participante.<br>
+            <strong>Opcionales:</strong> apellidos, DPI, correo, teléfono, institución, cargo, fotografía y observaciones.
+          </div>
+          <button class="btn btn-primary w-100" {% if not can_enroll %}disabled{% endif %}>Guardar matrícula</button>
+        </form>
       </div>
     </div>
   </div>
@@ -470,87 +441,41 @@
 
 
 <!-- ========================= -->
-<!--   AJAX DPI LOOKUP         -->
+<!--   ACCIONES DE ENLACES     -->
 <!-- ========================= -->
 <script>
 $(document).ready(function () {
-  const enrollmentLocked = {% if can_enroll %}false{% else %}true{% endif %};
   $(".js-copy-link").on("click", function () {
     var button = $(this);
     var url = button.data("copy-url");
     var originalText = button.text();
 
-    try {
-      navigator.clipboard.writeText(url).then(function () {
-        button.text("Copiado");
-        if (window.showDiplomaToast) {
-          window.showDiplomaToast("Link copiado al portapapeles.", "success");
-        }
-        setTimeout(function () { button.text(originalText); }, 1600);
-      }).catch(function () {
-        var tempInput = $("<input>");
-        $("body").append(tempInput);
-        tempInput.val(url).trigger("select");
-        document.execCommand("copy");
-        tempInput.remove();
-        button.text("Copiado");
-        if (window.showDiplomaToast) {
-          window.showDiplomaToast("Link copiado al portapapeles.", "success");
-        }
-        setTimeout(function () { button.text(originalText); }, 1600);
-      });
-    } catch (error) {
-      var fallbackInput = $("<input>");
-      $("body").append(fallbackInput);
-      fallbackInput.val(url).trigger("select");
-      document.execCommand("copy");
-      fallbackInput.remove();
+    var markCopied = function () {
       button.text("Copiado");
       if (window.showDiplomaToast) {
         window.showDiplomaToast("Link copiado al portapapeles.", "success");
       }
       setTimeout(function () { button.text(originalText); }, 1600);
+    };
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(markCopied).catch(function () {
+        var tempInput = $("<input>");
+        $("body").append(tempInput);
+        tempInput.val(url).trigger("select");
+        document.execCommand("copy");
+        tempInput.remove();
+        markCopied();
+      });
+    } else {
+      var fallbackInput = $("<input>");
+      $("body").append(fallbackInput);
+      fallbackInput.val(url).trigger("select");
+      document.execCommand("copy");
+      fallbackInput.remove();
+      markCopied();
     }
   });
-
-  $("#id_dpi").on("keyup", function () {
-    var dpi = $(this).val();
-    var quickStatus = $("#quickLookupStatus");
-    var quickButton = $("#quickAddButton");
-    var quickEmployeeId = $("#id_empleado_id");
-
-    if (dpi.length < 5) {
-      $("#id_nombre_completo").val("");
-      quickEmployeeId.val("");
-      quickStatus.removeClass("text-success text-danger").addClass("text-muted").text("Ingrese un DPI válido para buscar.");
-      quickButton.prop("disabled", enrollmentLocked);
-      return;
-    }
-
-    $.ajax({
-      url: "{% url 'diplomas:buscar_empleado_por_dpi' %}",
-      data: { dpi: dpi },
-      success: function (data) {
-        if (data.existe) {
-          $("#id_nombre_completo").val(data.nombre_completo);
-          quickEmployeeId.val(data.empleado_id || "");
-          quickStatus.removeClass("text-danger text-muted").addClass("text-success").text("Participante encontrado. Puede agregarlo al curso.");
-          quickButton.prop("disabled", enrollmentLocked);
-        } else {
-          $("#id_nombre_completo").val("");
-          quickEmployeeId.val("");
-          quickStatus.removeClass("text-success text-muted").addClass("text-danger").text("No se encontró un participante con ese DPI. Use la matrícula manual.");
-          quickButton.prop("disabled", enrollmentLocked);
-        }
-      },
-      error: function () {
-        $("#id_nombre_completo").val("");
-        quickEmployeeId.val("");
-        quickStatus.removeClass("text-success text-muted").addClass("text-danger").text("Ocurrió un error al buscar el DPI.");
-      }
-    });
-  });
-
 });
 </script>
 
