@@ -25,6 +25,14 @@ def default_location_abbreviation(name):
     return compact or "GENERAL"
 
 
+class FraseMotivacional(models.Model):
+    frase = models.CharField(max_length=500)
+    personaje = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.personaje}: {self.frase}'
+
+
 class UbicacionDiploma(models.Model):
     nombre = models.CharField(max_length=150, unique=True)
     abreviatura = models.CharField(max_length=10, unique=True)
