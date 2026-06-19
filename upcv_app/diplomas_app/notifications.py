@@ -21,7 +21,8 @@ logger = logging.getLogger(__name__)
 
 def _build_course_context(participante, request=None):
     curso = participante.curso
-    institucion = "UPCV"
+    configuracion = ConfiguracionGeneral.get_solo()
+    institucion = (getattr(configuracion, "nombre_comercial", "") or getattr(configuracion, "nombre_institucion", "") or "ALI Academy")
     ubicacion = getattr(curso.ubicacion, "nombre", "Sin ubicación") if curso else "Sin ubicación"
 
     diploma_query = urlencode(

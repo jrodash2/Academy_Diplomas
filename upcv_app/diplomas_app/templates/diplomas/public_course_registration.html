@@ -83,11 +83,11 @@
         <div class="hero-panel">
             <div class="hero-brand">
                 <div class="hero-brand-logos">
-                    {% if configuracion and configuracion.logotipo %}
-                        <img src="{{ configuracion.logotipo.url }}" alt="Logotipo institucional principal">
+                    {% if configuracion and configuracion.logo_principal %}
+                        <img src="{{ configuracion.logo_principal.url }}" alt="Logotipo institucional principal">
                     {% endif %}
-                    {% if configuracion and configuracion.logotipo2 %}
-                        <img src="{{ configuracion.logotipo2.url }}" alt="Logotipo institucional secundario">
+                    {% if configuracion and configuracion.logo_secundario %}
+                        <img src="{{ configuracion.logo_secundario.url }}" alt="Logotipo institucional secundario">
                     {% endif %}
                 </div>
                 <div class="hero-badge" id="selectedLocationBadge">
@@ -96,7 +96,7 @@
                 </div>
             </div>
             <h1>Registro público de participantes</h1>
-            <p>{{ configuracion.nombre_institucion|default:"Unidad para la Prevención Comunitaria de la Violencia" }}. Complete el código del curso y escriba manualmente los datos del participante.</p>
+            <p>{{ configuracion.nombre_institucion|default:"Academia de Liderazgo, Innovación y Desarrollo Personal" }}. Complete el código del curso y escriba manualmente los datos del participante.</p>
         </div>
     </section>
 

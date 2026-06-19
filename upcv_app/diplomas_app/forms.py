@@ -51,12 +51,17 @@ class ConfiguracionGeneralForm(forms.ModelForm):
         model = ConfiguracionGeneral
         fields = [
             "nombre_institucion",
+            "nombre_comercial",
+            "abreviatura",
+            "significado_abreviatura",
+            "descripcion",
+            "slogan",
             "direccion",
             "telefono",
             "correo",
             "sitio_web",
-            "logotipo",
-            "logotipo2",
+            "logo_principal",
+            "logo_secundario",
             "sello",
             "nombre_autoridad",
             "cargo_autoridad",
@@ -64,20 +69,31 @@ class ConfiguracionGeneralForm(forms.ModelForm):
         ]
         widgets = {
             "nombre_institucion": forms.TextInput(attrs={"class": "form-control"}),
+            "nombre_comercial": forms.TextInput(attrs={"class": "form-control"}),
+            "abreviatura": forms.TextInput(attrs={"class": "form-control"}),
+            "significado_abreviatura": forms.TextInput(attrs={"class": "form-control"}),
+            "descripcion": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "slogan": forms.TextInput(attrs={"class": "form-control"}),
             "direccion": forms.TextInput(attrs={"class": "form-control"}),
             "telefono": forms.TextInput(attrs={"class": "form-control"}),
             "correo": forms.EmailInput(attrs={"class": "form-control"}),
             "sitio_web": forms.URLInput(attrs={"class": "form-control"}),
-            "logotipo": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "logotipo2": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "logo_principal": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "logo_secundario": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "sello": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "nombre_autoridad": forms.TextInput(attrs={"class": "form-control"}),
             "cargo_autoridad": forms.TextInput(attrs={"class": "form-control"}),
             "firma_autoridad": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }
         labels = {
-            "logotipo": "Logo institucional",
-            "logotipo2": "Logo secundario",
+            "nombre_institucion": "Nombre completo de la institución",
+            "nombre_comercial": "Nombre comercial",
+            "abreviatura": "Abreviatura",
+            "significado_abreviatura": "Significado de la abreviatura",
+            "descripcion": "Descripción / enfoque",
+            "slogan": "Slogan",
+            "logo_principal": "Logo principal",
+            "logo_secundario": "Logo secundario",
         }
 
 

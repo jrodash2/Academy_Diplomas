@@ -113,7 +113,7 @@ def build_public_course_links(request, curso):
 
 
 def get_public_branding_context(course=None):
-    config = None
+    config = ConfiguracionGeneral.get_solo()
     selected_course = course
     selected_location = getattr(selected_course, "ubicacion", None) if selected_course else None
     enrollment_open, enrollment_message = get_course_enrollment_status(selected_course)
@@ -217,7 +217,7 @@ def configuracion_general(request):
         form = ConfiguracionGeneralForm(request.POST, request.FILES, instance=configuracion)
         if form.is_valid():
             form.save()
-            messages.success(request, "Configuración general actualizada correctamente.")
+            messages.success(request, "Configuración institucional actualizada correctamente.")
             return redirect("diplomas:configuracion_general")
         messages.error(request, "Corrija los errores del formulario de configuración.")
     else:

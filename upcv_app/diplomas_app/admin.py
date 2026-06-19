@@ -5,8 +5,8 @@ from .models import ConfiguracionGeneral, Curso, CursoEmpleado, Diploma, DisenoD
 
 @admin.register(ConfiguracionGeneral)
 class ConfiguracionGeneralAdmin(admin.ModelAdmin):
-    list_display = ("nombre_institucion", "correo", "telefono", "actualizado")
-    search_fields = ("nombre_institucion", "correo", "telefono")
+    list_display = ("nombre_comercial", "nombre_institucion", "correo", "telefono", "actualizado")
+    search_fields = ("nombre_comercial", "nombre_institucion", "abreviatura", "correo", "telefono")
 
     def has_add_permission(self, request):
         if ConfiguracionGeneral.objects.exists():

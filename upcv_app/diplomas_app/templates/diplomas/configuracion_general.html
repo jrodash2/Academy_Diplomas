@@ -7,8 +7,8 @@
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div>
-            <h4 class="mb-1">Configuración general</h4>
-            <p class="text-muted mb-0">Datos institucionales usados por Diplomas.</p>
+            <h4 class="mb-1">Configuración institucional</h4>
+            <p class="text-muted mb-0">Fuente oficial de nombres, logos y datos usados en diplomas y certificados.</p>
           </div>
           <span class="badge bg-primary">Registro único</span>
         </div>
@@ -20,9 +20,29 @@
           {% endif %}
 
           <div class="row g-3">
-            <div class="col-md-12">
+            <div class="col-md-6">
               {{ form.nombre_institucion.label_tag }}{{ form.nombre_institucion }}
               {% for error in form.nombre_institucion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.nombre_comercial.label_tag }}{{ form.nombre_comercial }}
+              {% for error in form.nombre_comercial.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-4">
+              {{ form.abreviatura.label_tag }}{{ form.abreviatura }}
+              {% for error in form.abreviatura.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-8">
+              {{ form.significado_abreviatura.label_tag }}{{ form.significado_abreviatura }}
+              {% for error in form.significado_abreviatura.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.descripcion.label_tag }}{{ form.descripcion }}
+              {% for error in form.descripcion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.slogan.label_tag }}{{ form.slogan }}
+              {% for error in form.slogan.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             </div>
             <div class="col-md-12">
               {{ form.direccion.label_tag }}{{ form.direccion }}
@@ -49,19 +69,31 @@
               {% for error in form.cargo_autoridad.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             </div>
             <div class="col-md-6">
-              {{ form.logotipo.label_tag }}{{ form.logotipo }}
-              {% for error in form.logotipo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+              {{ form.logo_principal.label_tag }}{{ form.logo_principal }}
+              {% if configuracion.logo_principal %}
+                <img class="img-thumbnail mt-2" style="max-height:90px" src="{{ configuracion.logo_principal.url }}" alt="Logo principal actual">
+              {% else %}
+                <div class="text-muted small mt-2">Sin logo principal cargado.</div>
+              {% endif %}
+              {% for error in form.logo_principal.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             </div>
             <div class="col-md-6">
-              {{ form.logotipo2.label_tag }}{{ form.logotipo2 }}
-              {% for error in form.logotipo2.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+              {{ form.logo_secundario.label_tag }}{{ form.logo_secundario }}
+              {% if configuracion.logo_secundario %}
+                <img class="img-thumbnail mt-2" style="max-height:90px" src="{{ configuracion.logo_secundario.url }}" alt="Logo secundario actual">
+              {% else %}
+                <div class="text-muted small mt-2">Sin logo secundario cargado.</div>
+              {% endif %}
+              {% for error in form.logo_secundario.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             </div>
             <div class="col-md-6">
               {{ form.sello.label_tag }}{{ form.sello }}
+              {% if configuracion.sello %}<img class="img-thumbnail mt-2" style="max-height:90px" src="{{ configuracion.sello.url }}" alt="Sello actual">{% else %}<div class="text-muted small mt-2">Sin sello cargado.</div>{% endif %}
               {% for error in form.sello.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             </div>
             <div class="col-md-6">
               {{ form.firma_autoridad.label_tag }}{{ form.firma_autoridad }}
+              {% if configuracion.firma_autoridad %}<img class="img-thumbnail mt-2" style="max-height:90px" src="{{ configuracion.firma_autoridad.url }}" alt="Firma de autoridad actual">{% else %}<div class="text-muted small mt-2">Sin firma de autoridad cargada.</div>{% endif %}
               {% for error in form.firma_autoridad.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             </div>
           </div>

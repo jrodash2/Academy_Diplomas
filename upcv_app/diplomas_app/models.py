@@ -4,7 +4,14 @@ from django.utils import timezone
 
 
 
-INSTITUTION_CODE = "UPCV"
+INSTITUTION_CODE = "ALI"
+
+ALI_NOMBRE_INSTITUCION = "Academia de Liderazgo, Innovación y Desarrollo Personal"
+ALI_NOMBRE_COMERCIAL = "ALI Academy"
+ALI_ABREVIATURA = "ALI"
+ALI_SIGNIFICADO_ABREVIATURA = "Academia de Liderazgo e Innovación"
+ALI_DESCRIPCION = "Con enfoque en desarrollo personal, tecnología e inteligencia artificial."
+ALI_SLOGAN = "Formamos personas, impulsamos líderes y conectamos con el futuro."
 
 
 def normalize_location_abbreviation(value):
@@ -25,13 +32,18 @@ def default_location_abbreviation(name):
 
 
 class ConfiguracionGeneral(models.Model):
-    nombre_institucion = models.CharField(max_length=200, default="Unidad para la Prevención Comunitaria de la Violencia")
+    nombre_institucion = models.CharField(max_length=250, default=ALI_NOMBRE_INSTITUCION)
+    nombre_comercial = models.CharField(max_length=150, blank=True, null=True, default=ALI_NOMBRE_COMERCIAL)
+    abreviatura = models.CharField(max_length=50, blank=True, null=True, default=ALI_ABREVIATURA)
+    significado_abreviatura = models.CharField(max_length=250, blank=True, null=True, default=ALI_SIGNIFICADO_ABREVIATURA)
+    descripcion = models.TextField(blank=True, null=True, default=ALI_DESCRIPCION)
+    slogan = models.CharField(max_length=250, blank=True, null=True, default=ALI_SLOGAN)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     telefono = models.CharField(max_length=50, blank=True, null=True)
     correo = models.EmailField(blank=True, null=True)
     sitio_web = models.URLField(blank=True, null=True)
-    logotipo = models.ImageField(upload_to="configuracion/logos/", blank=True, null=True)
-    logotipo2 = models.ImageField(upload_to="configuracion/logos/", blank=True, null=True)
+    logo_principal = models.ImageField(upload_to="configuracion/logos/", blank=True, null=True)
+    logo_secundario = models.ImageField(upload_to="configuracion/logos/", blank=True, null=True)
     sello = models.ImageField(upload_to="configuracion/sellos/", blank=True, null=True)
     firma_autoridad = models.ImageField(upload_to="configuracion/firmas/", blank=True, null=True)
     nombre_autoridad = models.CharField(max_length=150, blank=True, null=True)
@@ -39,15 +51,35 @@ class ConfiguracionGeneral(models.Model):
     actualizado = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Configuración general"
-        verbose_name_plural = "Configuración general"
+        verbose_name = "Configuración institucional"
+        verbose_name_plural = "Configuración institucional"
 
     def __str__(self):
-        return self.nombre_institucion
+        return self.nombre_comercial or self.nombre_institucion
+
+    @classmethod
+    def defaults(cls):
+        return {
+            "nombre_institucion": ALI_NOMBRE_INSTITUCION,
+            "nombre_comercial": ALI_NOMBRE_COMERCIAL,
+            "abreviatura": ALI_ABREVIATURA,
+            "significado_abreviatura": ALI_SIGNIFICADO_ABREVIATURA,
+            "descripcion": ALI_DESCRIPCION,
+            "slogan": ALI_SLOGAN,
+        }
 
     @classmethod
     def get_solo(cls):
-        obj, _ = cls.objects.get_or_create(pk=1)
+        obj = cls.objects.order_by("pk").first()
+        if obj is None:
+            return cls.objects.create(**cls.defaults())
+        updated_fields = []
+        for field, value in cls.defaults().items():
+            if not getattr(obj, field):
+                setattr(obj, field, value)
+                updated_fields.append(field)
+        if updated_fields:
+            obj.save(update_fields=[*updated_fields, "actualizado"])
         return obj
 
 

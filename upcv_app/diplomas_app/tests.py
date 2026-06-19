@@ -58,7 +58,7 @@ class DiplomasScopeTests(TestCase):
         self.firma_a = Firma.objects.create(nombre="Firma A", rol="Director", firma="firmas/a.png", ubicacion=self.ubicacion_a)
         self.firma_b = Firma.objects.create(nombre="Firma B", rol="Director", firma="firmas/b.png", ubicacion=self.ubicacion_b)
         self.configuracion = ConfiguracionGeneral.objects.create(
-            nombre_institucion="UPCV Inicial",
+            nombre_institucion="ALI Inicial",
             direccion="Ciudad",
         )
 
@@ -430,7 +430,7 @@ class DiplomasScopeTests(TestCase):
         self.assertContains(response, "diploma-export-fitted-image")
         self.participante.refresh_from_db()
         self.assertTrue(Diploma.objects.filter(curso_empleado=self.participante).exists())
-        self.assertEqual(self.participante.diploma.numero_diploma, "UPCV-SC-0001-2026")
+        self.assertEqual(self.participante.diploma.numero_diploma, "ALI-SC-0001-2026")
 
     def test_diploma_number_is_scoped_per_location(self):
         participant_same_location = self.curso_a.participantes.create(
@@ -446,9 +446,9 @@ class DiplomasScopeTests(TestCase):
         diploma_a2 = Diploma.ensure_for_course_employee(participant_same_location)
         diploma_b1 = Diploma.ensure_for_course_employee(participant_other_location)
 
-        self.assertEqual(diploma_a1.numero_diploma, "UPCV-SC-0001-2026")
-        self.assertEqual(diploma_a2.numero_diploma, "UPCV-SC-0002-2026")
-        self.assertEqual(diploma_b1.numero_diploma, "UPCV-SN-0001-2026")
+        self.assertEqual(diploma_a1.numero_diploma, "ALI-SC-0001-2026")
+        self.assertEqual(diploma_a2.numero_diploma, "ALI-SC-0002-2026")
+        self.assertEqual(diploma_b1.numero_diploma, "ALI-SN-0001-2026")
 
     def test_public_diploma_download_shows_clear_message_when_employee_is_not_enrolled(self):
         empleado_no_inscrito = Empleado.objects.create(
@@ -523,12 +523,13 @@ class DiplomasScopeTests(TestCase):
             },
         }
         self.diseno_a.save(update_fields=["estilos"])
-        self.configuracion.nombre_institucion = "UPCV Actualizada"
-        self.configuracion.save(update_fields=["nombre_institucion"])
+        self.configuracion.nombre_institucion = "ALI Actualizada"
+        self.configuracion.nombre_comercial = "ALI Actualizada"
+        self.configuracion.save(update_fields=["nombre_institucion", "nombre_comercial"])
 
         render_context = build_diploma_render_context(self.participante)
         render_map = {item["key"]: item for item in render_context["render_elements"]}
-        self.assertEqual(render_map["titulo_institucional"]["rendered_value"], "UPCV Actualizada")
+        self.assertEqual(render_map["titulo_institucional"]["rendered_value"], "ALI Actualizada")
 
     def test_signature_updates_and_removed_slots_are_resolved_dynamically(self):
         self.diseno_a.estilos = {

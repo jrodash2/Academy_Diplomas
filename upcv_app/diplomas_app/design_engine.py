@@ -15,10 +15,12 @@ DEFAULT_FONT_FAMILY = 'Georgia, "Times New Roman", serif'
 DEFAULT_FONT_WEIGHT = "400"
 
 LEGACY_ELEMENT_KEY_MAP = {
-    "logo1": "logo_gobierno",
-    "logo_1": "logo_gobierno",
-    "logo2": "logo_upcv",
-    "logo_2": "logo_upcv",
+    "logo1": "logo_secundario",
+    "logo_1": "logo_secundario",
+    "logo_gobierno": "logo_secundario",
+    "logo2": "logo_principal",
+    "logo_2": "logo_principal",
+    "logo_upcv": "logo_principal",
     "institucion": "titulo_institucional",
     "titulo": "subtitulo_diploma",
     "nombre": "participante_nombre",
@@ -169,8 +171,8 @@ DYNAMIC_TEXT_KEYS = {
 }
 
 DYNAMIC_IMAGE_KEYS = {
-    "logo_gobierno",
-    "logo_upcv",
+    "logo_secundario",
+    "logo_principal",
     "foto_participante",
 }
 
@@ -314,7 +316,7 @@ def build_signature_elements(firmas, signature_slots):
 
 
 def build_base_elements(diseno=None, firmas=None, signature_slots=2):
-    config = None
+    config = ConfiguracionGeneral.get_solo()
     firmas = firmas if firmas is not None else get_design_signatures(diseno)
 
     base_elements = {
@@ -331,29 +333,29 @@ def build_base_elements(diseno=None, firmas=None, signature_slots=2):
             image_url=design_background_url(diseno),
             visible=True,
         ),
-        "logo_gobierno": _base_element(
-            key="logo_gobierno",
-            label="Logo Gobierno",
+        "logo_secundario": _base_element(
+            key="logo_secundario",
+            label="Logo secundario",
             element_type="imagen",
             x=1180,
             y=70,
             width=210,
             height=210,
             z_index=10,
-            token="{{ logo_gobierno }}",
-            image_url=media_url(getattr(config, "logotipo2", None)),
+            token="{{ logo_secundario }}",
+            image_url=media_url(getattr(config, "logo_secundario", None)),
         ),
-        "logo_upcv": _base_element(
-            key="logo_upcv",
-            label="Logo UPCV",
+        "logo_principal": _base_element(
+            key="logo_principal",
+            label="Logo principal",
             element_type="imagen",
             x=1690,
             y=70,
             width=210,
             height=210,
             z_index=11,
-            token="{{ logo_upcv }}",
-            image_url=media_url(getattr(config, "logotipo", None)),
+            token="{{ logo_principal }}",
+            image_url=media_url(getattr(config, "logo_principal", None)),
         ),
         "titulo_institucional": _base_element(
             key="titulo_institucional",
@@ -365,7 +367,7 @@ def build_base_elements(diseno=None, firmas=None, signature_slots=2):
             height=120,
             z_index=20,
             token="{{ institucion_nombre }}",
-            texto=getattr(config, "nombre_institucion", "") or "Unidad para la Prevención Comunitaria de la Violencia",
+            texto=getattr(config, "nombre_comercial", "") or getattr(config, "nombre_institucion", "") or "ALI Academy",
             font_size=54,
             font_weight="700",
         ),
@@ -480,7 +482,7 @@ def build_base_elements(diseno=None, firmas=None, signature_slots=2):
             height=70,
             z_index=28,
             token="{{ fecha }}",
-            texto="Guatemala, {{ fecha }} © UPCV",
+            texto="Guatemala, {{ fecha }} © {{ institucion_comercial }}",
             font_size=32,
             font_family='Arial, "Helvetica Neue", Helvetica, sans-serif',
         ),
@@ -641,7 +643,7 @@ def render_text_content(element_key, resolved_text):
 
 
 def build_token_context_map(*, curso=None, curso_empleado=None, config=None, firmas=None, sample=False):
-    config = config if config is not None else None
+    config = config if config is not None else ConfiguracionGeneral.get_solo()
     firmas = firmas if firmas is not None else get_course_signatures(curso)
 
     participante_nombre = "NOMBRE DEL PARTICIPANTE"
@@ -649,7 +651,7 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
     descripcion_curso = getattr(curso, "descripcion", "") or ("Descripción del curso" if sample else "")
     sample_location = getattr(curso, "ubicacion", None)
     sample_location_code = getattr(sample_location, "abreviatura", "") if sample_location else "GRAL"
-    codigo = f"UPCV-{sample_location_code or 'GRAL'}-0001-{timezone.now().year}"
+    codigo = f"ALI-{sample_location_code or 'GRAL'}-0001-{timezone.now().year}"
     if curso_empleado is not None:
         raw_name = getattr(curso_empleado, "nombre_participante", "") or ""
         participante_nombre = format_participant_name(raw_name)
@@ -674,11 +676,20 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
         "{{ descripcion_curso }}": descripcion_curso,
         "{{ codigo }}": codigo,
         "{{ fecha }}": timezone.now().strftime("%Y"),
-        "{{ institucion_nombre }}": config.nombre_institucion if config else "",
+        "{{ institucion_nombre }}": config.nombre_institucion if config else "Academia de Liderazgo, Innovación y Desarrollo Personal",
+        "{{ institucion_comercial }}": config.nombre_comercial if config else "ALI Academy",
+        "{{ institucion_abreviatura }}": config.abreviatura if config else "ALI",
+        "{{ institucion_significado }}": config.significado_abreviatura if config else "Academia de Liderazgo e Innovación",
+        "{{ institucion_descripcion }}": config.descripcion if config else "Con enfoque en desarrollo personal, tecnología e inteligencia artificial.",
+        "{{ institucion_slogan }}": config.slogan if config else "Formamos personas, impulsamos líderes y conectamos con el futuro.",
+        "{{ nombre_autoridad }}": config.nombre_autoridad if config else "",
+        "{{ cargo_autoridad }}": config.cargo_autoridad if config else "",
         "{{ subtitulo_diploma }}": "OTORGA EL PRESENTE DIPLOMA A:",
         "{{ adorno_central }}": "──────────── ✦ ────────────",
-        "{{ logo_gobierno }}": "",
-        "{{ logo_upcv }}": "",
+        "{{ logo_secundario }}": media_url(getattr(config, "logo_secundario", None)) if config else "",
+        "{{ logo_principal }}": media_url(getattr(config, "logo_principal", None)) if config else "",
+        "{{ sello }}": media_url(getattr(config, "sello", None)) if config else "",
+        "{{ firma_autoridad }}": media_url(getattr(config, "firma_autoridad", None)) if config else "",
         "{{ fondo_diploma }}": "",
     }
     for index, firma in enumerate(firmas, start=1):
@@ -691,7 +702,7 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
 def build_design_editor_payload(diseno, firmas=None):
     firmas = firmas if firmas is not None else get_design_signatures(diseno)
     definition = build_design_definition(diseno, None, firmas=firmas)
-    preview_context = build_token_context_map(config=None, firmas=firmas, sample=True)
+    preview_context = build_token_context_map(config=ConfiguracionGeneral.get_solo(), firmas=firmas, sample=True)
     return {
         "definition": definition,
         "preview_context": preview_context,
@@ -753,7 +764,7 @@ def build_diploma_render_context(curso_empleado):
         "diploma",
     ).get(pk=curso_empleado.pk)
     curso = curso_empleado.curso
-    config = None
+    config = ConfiguracionGeneral.get_solo()
     firmas = get_course_signatures(curso)
     definition = build_course_design_definition(curso, firmas=firmas)
     context_map = build_token_context_map(
