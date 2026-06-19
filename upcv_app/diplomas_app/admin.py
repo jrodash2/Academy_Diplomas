@@ -33,7 +33,6 @@ class DisenoDiplomaAdmin(admin.ModelAdmin):
 class CursoEmpleadoInline(admin.TabularInline):
     model = CursoEmpleado
     extra = 0
-    autocomplete_fields = ("empleado",)
 
 
 @admin.register(Curso)
@@ -48,16 +47,16 @@ class CursoAdmin(admin.ModelAdmin):
 
 @admin.register(CursoEmpleado)
 class CursoEmpleadoAdmin(admin.ModelAdmin):
-    list_display = ("curso", "empleado", "fecha_asignacion")
-    search_fields = ("empleado__nombres", "empleado__apellidos", "curso__nombre", "curso__ubicacion__abreviatura")
+    list_display = ("nombre_participante", "participante_dpi", "curso", "participante_correo", "fecha_asignacion")
+    search_fields = ("participante_nombre", "participante_apellidos", "participante_dpi", "participante_correo", "curso__nombre", "curso__ubicacion__abreviatura")
     list_filter = ("curso__ubicacion", "curso", "fecha_asignacion")
-    autocomplete_fields = ("curso", "empleado")
+    autocomplete_fields = ("curso",)
 
 
 @admin.register(Diploma)
 class DiplomaAdmin(admin.ModelAdmin):
     list_display = ("numero_diploma", "curso_empleado", "fecha_emision", "generado_en")
-    search_fields = ("numero_diploma", "curso_empleado__empleado__nombres", "curso_empleado__empleado__apellidos")
+    search_fields = ("numero_diploma", "curso_empleado__participante_nombre", "curso_empleado__participante_apellidos", "curso_empleado__participante_dpi")
     list_filter = ("fecha_emision", "generado_en")
     autocomplete_fields = ("curso_empleado",)
     readonly_fields = ("generado_en",)
