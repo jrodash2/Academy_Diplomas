@@ -68,11 +68,11 @@
         <div class="hero-panel">
             <div class="hero-brand">
                 <div class="hero-brand-logos">
-                    {% if configuracion and configuracion.logotipo %}
-                        <img src="{{ configuracion.logotipo.url }}" alt="Logotipo institucional principal">
+                    {% if configuracion and configuracion.logo_principal %}
+                        <img src="{{ configuracion.logo_principal.url }}" alt="Logotipo institucional principal">
                     {% endif %}
-                    {% if configuracion and configuracion.logotipo2 %}
-                        <img src="{{ configuracion.logotipo2.url }}" alt="Logotipo institucional secundario">
+                    {% if configuracion and configuracion.logo_secundario %}
+                        <img src="{{ configuracion.logo_secundario.url }}" alt="Logotipo institucional secundario">
                     {% endif %}
                 </div>
                 <div class="hero-badge">
@@ -81,7 +81,7 @@
                 </div>
             </div>
             <h1>Descarga pública de diplomas</h1>
-            <p>{{ configuracion.nombre_institucion|default:"Unidad para la Prevención Comunitaria de la Violencia" }}. Ingrese el código del curso y el DPI del participante para validar la matrícula y abrir la vista de descarga del diploma.</p>
+            <p>{{ configuracion.nombre_institucion|default:"Academia de Liderazgo, Innovación y Desarrollo Personal" }}. Ingrese el código del curso y el DPI del participante para validar la matrícula y abrir la vista de descarga del diploma.</p>
         </div>
     </section>
 

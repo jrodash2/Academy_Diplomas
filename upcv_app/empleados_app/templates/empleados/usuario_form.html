@@ -1,0 +1,62 @@
+{% extends 'diplomas/base.html' %}
+
+{% block content %}
+<div class="page-body">
+  <div class="container-fluid">
+    <div class="card mt-3 shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="mb-1">{% if modo == 'editar' %}Editar usuario{% else %}Crear usuario{% endif %}</h4>
+            <p class="text-muted mb-0">Complete los datos de acceso y grupo del usuario.</p>
+          </div>
+          <a class="btn btn-light" href="{% url 'empleados:usuarios_list' %}">Volver</a>
+        </div>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              {{ form.username.label_tag }}{{ form.username }}
+              {% for error in form.username.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.email.label_tag }}{{ form.email }}
+              {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.first_name.label_tag }}{{ form.first_name }}
+              {% for error in form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.last_name.label_tag }}{{ form.last_name }}
+              {% for error in form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.group.label_tag }}{{ form.group }}
+              {% for error in form.group.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6 d-flex align-items-center pt-4">
+              <div class="form-check">{{ form.is_active }} {{ form.is_active.label_tag }}</div>
+              {% for error in form.is_active.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.password.label_tag }}{{ form.password }}
+              {% if form.password.help_text %}<small class="text-muted">{{ form.password.help_text }}</small>{% endif %}
+              {% for error in form.password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.password_confirm.label_tag }}{{ form.password_confirm }}
+              {% for error in form.password_confirm.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+          </div>
+          <div class="text-end mt-4">
+            <button class="btn btn-primary" type="submit">Guardar usuario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

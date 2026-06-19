@@ -1,5 +1,5 @@
 # context_processors.py
-from .models import FraseMotivacional
+from diplomas_app.models import FraseMotivacional
 import random
 
 def frase_del_dia(request):

@@ -183,7 +183,7 @@ document.getElementById('btnDescargarJPG').onclick = async () => {
 
   const link = document.createElement('a');
   link.href = finalCanvas.toDataURL('image/jpeg', 1.0);
-  link.download = 'Diploma_{{ curso_empleado.empleado.nombres }}_{{ curso_empleado.empleado.apellidos }}.jpg';
+  link.download = 'Diploma_{{ curso_empleado.nombre_participante|slugify }}.jpg';
   link.click();
 };
 
