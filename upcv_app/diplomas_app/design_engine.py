@@ -106,6 +106,7 @@ def _base_element(
     visible=True,
     shape="rect",
     campo="",
+    dynamic_type="",
 ):
     return {
         "key": key,
@@ -127,6 +128,7 @@ def _base_element(
         "image_url": image_url,
         "shape": shape,
         "campo": campo,
+        "dynamicType": dynamic_type,
     }
 
 
@@ -137,7 +139,7 @@ def build_custom_element_fallback(key, raw_element):
     default_width = 360 if element_type == "imagen" else 720
     default_height = 220 if element_type == "imagen" else 140
     default_text = "Nuevo texto" if element_type != "imagen" else ""
-    default_image = raw.get("image_url") or ""
+    default_image = raw.get("image_url") or raw.get("src") or ""
     return _base_element(
         key=key,
         label=default_label,
@@ -148,7 +150,7 @@ def build_custom_element_fallback(key, raw_element):
         height=clamp_number(raw.get("height"), default_height, min_value=20, max_value=CANVAS_HEIGHT),
         z_index=int(clamp_number(raw.get("z_index", raw.get("zIndex")), 90, min_value=0, max_value=9999)),
         token=raw.get("token") or "",
-        texto=raw.get("texto") or raw.get("content") or default_text,
+        texto=raw.get("texto") or raw.get("text") or raw.get("content") or default_text,
         image_url=default_image,
         font_size=clamp_number(raw.get("font_size", raw.get("fontSize")), 34, min_value=8, max_value=300),
         font_family=raw.get("font_family") or raw.get("fontFamily") or DEFAULT_FONT_FAMILY,
@@ -158,6 +160,7 @@ def build_custom_element_fallback(key, raw_element):
         visible=bool(raw.get("visible", True)),
         shape=raw.get("shape") or "rect",
         campo=raw.get("campo") or raw.get("field") or "",
+        dynamic_type=raw.get("dynamicType") or raw.get("dynamic_type") or "",
     )
 
 SIGNATURE_KEY_PATTERN = re.compile(r"^firma_(\d+)_(imagen|nombre|cargo)$")
@@ -525,11 +528,20 @@ def normalize_element(key, raw_element, fallback_element):
         "align": raw.get("align") or raw.get("textAlign") or raw.get("alineacion") or fallback["align"],
         "z_index": int(clamp_number(raw.get("z_index", raw.get("zIndex")), fallback["z_index"], min_value=0, max_value=9999)),
         "token": raw.get("token") or fallback["token"],
-        "texto": raw.get("texto") or raw.get("content") or fallback["texto"],
-        "image_url": raw.get("image_url") or fallback["image_url"],
+        "texto": raw.get("texto") or raw.get("text") or raw.get("content") or fallback["texto"],
+        "image_url": raw.get("image_url") or raw.get("src") or fallback["image_url"],
         "shape": raw.get("shape") or fallback.get("shape", "rect"),
         "campo": raw.get("campo") or raw.get("field") or fallback.get("campo", ""),
+        "dynamicType": raw.get("dynamicType") or raw.get("dynamic_type") or fallback.get("dynamicType", ""),
     }
+    if normalized["campo"].startswith("configuracion."):
+        token = "{{" + normalized["campo"] + "}}"
+        normalized["token"] = token
+        normalized["dynamicType"] = normalized["dynamicType"] or "institutional"
+        if normalized["type"] == "imagen":
+            normalized["image_url"] = token
+        else:
+            normalized["texto"] = token
     if is_dynamic_text_key(key):
         normalized["texto"] = fallback["texto"]
         normalized["token"] = fallback["token"]

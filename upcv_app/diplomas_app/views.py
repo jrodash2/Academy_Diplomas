@@ -60,6 +60,27 @@ logger = logging.getLogger(__name__)
 
 # Helpers
 
+def build_configuracion_editor_json(configuracion):
+    return {
+        "configuracion.nombre_institucion": configuracion.nombre_institucion or "Academia de Liderazgo, Innovación y Desarrollo Personal",
+        "configuracion.nombre_comercial": configuracion.nombre_comercial or "ALI Academy",
+        "configuracion.abreviatura": configuracion.abreviatura or "ALI",
+        "configuracion.significado_abreviatura": configuracion.significado_abreviatura or "Academia de Liderazgo e Innovación",
+        "configuracion.descripcion": configuracion.descripcion or "Con enfoque en desarrollo personal, tecnología e inteligencia artificial.",
+        "configuracion.slogan": configuracion.slogan or "Formamos personas, impulsamos líderes y conectamos con el futuro.",
+        "configuracion.nombre_autoridad": configuracion.nombre_autoridad or "Nombre de autoridad",
+        "configuracion.cargo_autoridad": configuracion.cargo_autoridad or "Cargo de autoridad",
+        "configuracion.correo": configuracion.correo or "correo@aliacademy.com",
+        "configuracion.telefono": configuracion.telefono or "Teléfono institucional",
+        "configuracion.sitio_web": configuracion.sitio_web or "www.aliacademy.com",
+        "configuracion.direccion": configuracion.direccion or "Dirección institucional",
+        "configuracion.logo_principal": configuracion.logo_principal.url if configuracion.logo_principal else "",
+        "configuracion.logo_secundario": configuracion.logo_secundario.url if configuracion.logo_secundario else "",
+        "configuracion.sello": configuracion.sello.url if configuracion.sello else "",
+        "configuracion.firma_autoridad": configuracion.firma_autoridad.url if configuracion.firma_autoridad else "",
+    }
+
+
 def render_diplomas(request, template_name, context=None):
     context = context or {}
     return render(request, template_name, attach_diplomas_context(context, request))
@@ -458,10 +479,12 @@ def modificar_diseno_visual(request, diseno_id):
     diseno = get_design_or_404(request, id=diseno_id)
     editor_payload = build_design_editor_payload(diseno)
     definition = editor_payload["definition"]
+    configuracion = ConfiguracionGeneral.get_solo()
     context = {
         "diseno": diseno,
         "elementos_json": definition,
         "preview_context_json": editor_payload["preview_context"],
+        "configuracion_json": build_configuracion_editor_json(configuracion),
         "fondo_url": definition["elements"]["fondo_diploma"]["image_url"],
         "canvas_width": CANVAS_WIDTH,
         "canvas_height": CANVAS_HEIGHT,

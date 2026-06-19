@@ -84,39 +84,96 @@
 
 
           <section class="editor-sidebar-panel" data-tab-panel="institution">
-            <div class="diploma-sidebar-heading">
-              <div>
-                <h5 class="mb-1">Datos institucionales</h5>
-                <p class="mb-0 text-muted small">Inserta campos dinámicos de Configuración institucional; se actualizarán automáticamente al cambiar la configuración.</p>
+            <div class="institutional-panel">
+              <div class="institutional-panel-intro">
+                <span class="institutional-panel-icon"><i class="fa-solid fa-landmark"></i></span>
+                <div>
+                  <h5 class="mb-1">Datos institucionales</h5>
+                  <p class="text-muted small mb-0">Inserta campos dinámicos de Configuración institucional. Si la configuración cambia, el diploma se actualizará automáticamente.</p>
+                </div>
               </div>
-            </div>
 
-            <div class="editor-institution-field-group">
-              <h6>Logos y firmas</h6>
-              <button type="button" class="editor-institution-field" data-field-type="imagen" data-field="configuracion.logo_principal" data-label="Logo principal" data-token="{% templatetag openvariable %}configuracion.logo_principal{% templatetag closevariable %}">Logo principal</button>
-              <button type="button" class="editor-institution-field" data-field-type="imagen" data-field="configuracion.logo_secundario" data-label="Logo secundario" data-token="{% templatetag openvariable %}configuracion.logo_secundario{% templatetag closevariable %}">Logo secundario</button>
-              <button type="button" class="editor-institution-field" data-field-type="imagen" data-field="configuracion.sello" data-label="Sello" data-token="{% templatetag openvariable %}configuracion.sello{% templatetag closevariable %}">Sello</button>
-              <button type="button" class="editor-institution-field" data-field-type="imagen" data-field="configuracion.firma_autoridad" data-label="Firma de autoridad" data-token="{% templatetag openvariable %}configuracion.firma_autoridad{% templatetag closevariable %}">Firma de autoridad</button>
-            </div>
+              <div class="institutional-group">
+                <h6 class="institutional-title">Logos y firmas</h6>
+                <div class="institutional-grid">
+                <button type="button" class="btn-institutional-field" data-type="image" data-field="configuracion.logo_principal" data-label="Logo principal">
+                  <span class="institutional-field-icon"><i class="fa-regular fa-image"></i></span>
+                  <span class="institutional-field-label">Logo principal</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="image" data-field="configuracion.logo_secundario" data-label="Logo secundario">
+                  <span class="institutional-field-icon"><i class="fa-regular fa-images"></i></span>
+                  <span class="institutional-field-label">Logo secundario</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="image" data-field="configuracion.sello" data-label="Sello">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-certificate"></i></span>
+                  <span class="institutional-field-label">Sello</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="image" data-field="configuracion.firma_autoridad" data-label="Firma de autoridad">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-signature"></i></span>
+                  <span class="institutional-field-label">Firma de autoridad</span>
+                </button>
+                </div>
+              </div>
 
-            <div class="editor-institution-field-group">
-              <h6>Identidad institucional</h6>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.nombre_institucion" data-label="Nombre de institución" data-token="{% templatetag openvariable %}configuracion.nombre_institucion{% templatetag closevariable %}">Nombre de institución</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.nombre_comercial" data-label="Nombre comercial" data-token="{% templatetag openvariable %}configuracion.nombre_comercial{% templatetag closevariable %}">Nombre comercial</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.abreviatura" data-label="Abreviatura" data-token="{% templatetag openvariable %}configuracion.abreviatura{% templatetag closevariable %}">Abreviatura</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.significado_abreviatura" data-label="Significado de abreviatura" data-token="{% templatetag openvariable %}configuracion.significado_abreviatura{% templatetag closevariable %}">Significado de abreviatura</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.descripcion" data-label="Descripción / enfoque" data-token="{% templatetag openvariable %}configuracion.descripcion{% templatetag closevariable %}">Descripción / enfoque</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.slogan" data-label="Slogan" data-token="{% templatetag openvariable %}configuracion.slogan{% templatetag closevariable %}">Slogan</button>
-            </div>
+              <div class="institutional-group">
+                <h6 class="institutional-title">Identidad institucional</h6>
+                <div class="institutional-grid">
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.nombre_institucion" data-label="Nombre de institución">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-building-columns"></i></span>
+                  <span class="institutional-field-label">Nombre de institución</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.nombre_comercial" data-label="Nombre comercial">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-id-badge"></i></span>
+                  <span class="institutional-field-label">Nombre comercial</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.abreviatura" data-label="Abreviatura">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-a"></i></span>
+                  <span class="institutional-field-label">Abreviatura</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.significado_abreviatura" data-label="Significado de abreviatura">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-spell-check"></i></span>
+                  <span class="institutional-field-label">Significado de abreviatura</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.descripcion" data-label="Descripción / enfoque">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-align-left"></i></span>
+                  <span class="institutional-field-label">Descripción / enfoque</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.slogan" data-label="Slogan">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-quote-right"></i></span>
+                  <span class="institutional-field-label">Slogan</span>
+                </button>
+                </div>
+              </div>
 
-            <div class="editor-institution-field-group">
-              <h6>Autoridad y contacto</h6>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.nombre_autoridad" data-label="Nombre de autoridad" data-token="{% templatetag openvariable %}configuracion.nombre_autoridad{% templatetag closevariable %}">Nombre de autoridad</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.cargo_autoridad" data-label="Cargo de autoridad" data-token="{% templatetag openvariable %}configuracion.cargo_autoridad{% templatetag closevariable %}">Cargo de autoridad</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.correo" data-label="Correo" data-token="{% templatetag openvariable %}configuracion.correo{% templatetag closevariable %}">Correo</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.telefono" data-label="Teléfono" data-token="{% templatetag openvariable %}configuracion.telefono{% templatetag closevariable %}">Teléfono</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.sitio_web" data-label="Sitio web" data-token="{% templatetag openvariable %}configuracion.sitio_web{% templatetag closevariable %}">Sitio web</button>
-              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.direccion" data-label="Dirección" data-token="{% templatetag openvariable %}configuracion.direccion{% templatetag closevariable %}">Dirección</button>
+              <div class="institutional-group">
+                <h6 class="institutional-title">Autoridad y contacto</h6>
+                <div class="institutional-grid">
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.nombre_autoridad" data-label="Nombre de autoridad">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-user-tie"></i></span>
+                  <span class="institutional-field-label">Nombre de autoridad</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.cargo_autoridad" data-label="Cargo de autoridad">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-briefcase"></i></span>
+                  <span class="institutional-field-label">Cargo de autoridad</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.correo" data-label="Correo">
+                  <span class="institutional-field-icon"><i class="fa-regular fa-envelope"></i></span>
+                  <span class="institutional-field-label">Correo</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.telefono" data-label="Teléfono">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-phone"></i></span>
+                  <span class="institutional-field-label">Teléfono</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.sitio_web" data-label="Sitio web">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-globe"></i></span>
+                  <span class="institutional-field-label">Sitio web</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.direccion" data-label="Dirección">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-location-dot"></i></span>
+                  <span class="institutional-field-label">Dirección</span>
+                </button>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -240,5 +297,6 @@
 
 {{ elementos_json|json_script:"diplomaDesignDefinition" }}
 {{ preview_context_json|json_script:"diplomaPreviewContext" }}
+{{ configuracion_json|json_script:"configuracion-data" }}
 <script src="{% static 'diplomas_app/js/diploma_editor.js' %}"></script>
 {% endblock %}

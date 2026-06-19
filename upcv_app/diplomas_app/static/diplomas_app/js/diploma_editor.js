@@ -1,6 +1,7 @@
 (function () {
   const payloadNode = document.getElementById("diplomaDesignDefinition");
   const previewContextNode = document.getElementById("diplomaPreviewContext");
+  const configuracionNode = document.getElementById("configuracion-data");
   const canvas = document.getElementById("diplomaEditorCanvas");
   if (!payloadNode || !canvas) {
     return;
@@ -8,6 +9,25 @@
 
   const definition = JSON.parse(payloadNode.textContent || "{}");
   const previewContext = previewContextNode ? JSON.parse(previewContextNode.textContent || "{}") : {};
+  const configuracionData = configuracionNode ? JSON.parse(configuracionNode.textContent || "{}") : {};
+  const institutionalFallbacks = {
+    "configuracion.nombre_institucion": "Academia de Liderazgo, Innovación y Desarrollo Personal",
+    "configuracion.nombre_comercial": "ALI Academy",
+    "configuracion.abreviatura": "ALI",
+    "configuracion.significado_abreviatura": "Academia de Liderazgo e Innovación",
+    "configuracion.descripcion": "Con enfoque en desarrollo personal, tecnología e inteligencia artificial.",
+    "configuracion.slogan": "Formamos personas, impulsamos líderes y conectamos con el futuro.",
+    "configuracion.nombre_autoridad": "Nombre de autoridad",
+    "configuracion.cargo_autoridad": "Cargo de autoridad",
+    "configuracion.correo": "correo@aliacademy.com",
+    "configuracion.telefono": "Teléfono institucional",
+    "configuracion.sitio_web": "www.aliacademy.com",
+    "configuracion.direccion": "Dirección institucional",
+    "configuracion.logo_principal": "",
+    "configuracion.logo_secundario": "",
+    "configuracion.sello": "",
+    "configuracion.firma_autoridad": "",
+  };
   const canvasWidth = Number(canvas.dataset.canvasWidth || 3508);
   const canvasHeight = Number(canvas.dataset.canvasHeight || 2480);
   const fallbackBackgroundUrl = canvas.dataset.backgroundUrl || "";
@@ -85,7 +105,7 @@
     imageInput: document.getElementById("editorImageInput"),
     replaceImage: document.getElementById("editorReplaceImage"),
     uploadFeedback: document.getElementById("editorUploadFeedback"),
-    institutionFields: Array.from(document.querySelectorAll(".editor-institution-field")),
+    institutionFields: Array.from(document.querySelectorAll(".btn-institutional-field, .editor-institution-field")),
   };
 
   function csrfToken() {
@@ -181,6 +201,7 @@
     normalized.image_url = normalized.image_url || "";
     normalized.shape = normalized.shape || "rect";
     normalized.campo = normalized.campo || normalized.field || "";
+    normalized.dynamicType = normalized.dynamicType || normalized.dynamic_type || "";
 
     if (normalized.key === "fondo_diploma") {
       normalized.x = 0;
@@ -198,8 +219,25 @@
     });
   }
 
+  function institutionalValue(field) {
+    if (!field) {
+      return "";
+    }
+    const configured = configuracionData[field];
+    if (configured) {
+      return configured;
+    }
+    return institutionalFallbacks[field] || "";
+  }
+
+  function tokenForField(field) {
+    return field ? `{{${field}}}` : "";
+  }
+
   function previewText(element) {
-    let resolved = element.texto || element.token || element.label || element.key;
+    let resolved = element.campo && element.type !== "imagen"
+      ? institutionalValue(element.campo) || element.label || element.key
+      : element.texto || element.token || element.label || element.key;
     Object.entries(previewContext).forEach(function (entry) {
       const token = entry[0];
       const value = entry[1];
@@ -209,7 +247,9 @@
   }
 
   function previewImageUrl(element) {
-    let resolved = element.image_url || "";
+    let resolved = element.campo && element.type === "imagen"
+      ? institutionalValue(element.campo)
+      : element.image_url || "";
     Object.entries(previewContext).forEach(function (entry) {
       const token = entry[0];
       const value = entry[1];
@@ -308,13 +348,29 @@
     });
   }
 
+  function addInstitutionalElement(type, field, label) {
+    const normalizedType = type === "image" || type === "imagen" ? "imagen" : "texto";
+    const token = tokenForField(field);
+    const previewValue = institutionalValue(field) || label || field || "Dato institucional";
+    const newElement = createInstitutionalElement({
+      type: normalizedType,
+      field: field,
+      label: label,
+      token: token,
+      previewValue: previewValue,
+    });
+    state.elements[newElement.key] = newElement;
+    selectElement(newElement.key);
+    setFeedback("Dato institucional agregado al lienzo. Ajusta posición/tamaño y guarda el diseño.", "success");
+  }
+
   function createInstitutionalElement(config) {
     const fieldType = config.type === "imagen" ? "imagen" : "texto";
     const width = fieldType === "imagen" ? 420 : 900;
     const height = fieldType === "imagen" ? 220 : 120;
     const position = defaultPosition(width, height);
     const key = generateUniqueKey((config.field || "configuracion").replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "") || "configuracion");
-    const token = config.token || "";
+    const token = config.token || tokenForField(config.field);
     return normalizeElement({
       key: key,
       label: config.label || config.field || "Dato institucional",
@@ -335,6 +391,7 @@
       image_url: fieldType === "imagen" ? token : "",
       shape: "rect",
       campo: config.field || "",
+      dynamicType: "institutional",
     });
   }
 
@@ -579,6 +636,7 @@
     element.z_index = Number(ui.zIndex.value || element.z_index);
     element.visible = ui.visible.checked;
     element.campo = element.campo || "";
+    element.dynamicType = element.dynamicType || "";
 
     if (element.type !== "imagen") {
       element.texto = ui.texto.value;
@@ -788,15 +846,11 @@
 
   ui.institutionFields.forEach(function (button) {
     button.addEventListener("click", function () {
-      const newElement = createInstitutionalElement({
-        type: button.dataset.fieldType,
-        field: button.dataset.field,
-        label: button.dataset.label || button.textContent.trim(),
-        token: button.dataset.token,
-      });
-      state.elements[newElement.key] = newElement;
-      selectElement(newElement.key);
-      setFeedback("Dato institucional agregado al lienzo. Ajusta posición/tamaño y guarda el diseño.", "success");
+      addInstitutionalElement(
+        button.dataset.type || button.dataset.fieldType,
+        button.dataset.field,
+        button.dataset.label || button.textContent.trim()
+      );
     });
   });
 
