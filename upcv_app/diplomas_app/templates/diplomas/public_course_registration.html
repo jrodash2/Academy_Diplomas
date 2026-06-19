@@ -96,7 +96,7 @@
                 </div>
             </div>
             <h1>Registro público de participantes</h1>
-            <p>{{ configuracion.nombre_institucion|default:"Unidad para la Prevención Comunitaria de la Violencia" }}. Complete el código del curso y el DPI del participante. Si el DPI ya existe, el sistema recuperará el nombre automáticamente; si no existe, podrá completar el registro manual.</p>
+            <p>{{ configuracion.nombre_institucion|default:"Unidad para la Prevención Comunitaria de la Violencia" }}. Complete el código del curso y escriba manualmente los datos del participante.</p>
         </div>
     </section>
 
@@ -128,19 +128,19 @@
 
                     <div class="row">
                         <div class="field">
-                            <label for="{{ form.dpi.id_for_label }}">{{ form.dpi.label }}</label>
-                            {{ form.dpi }}
-                            {% if form.dpi.help_text %}<small>{{ form.dpi.help_text }}</small>{% endif %}
+                            <label for="{{ form.participante_nombre.id_for_label }}">{{ form.participante_nombre.label }}</label>
+                            {{ form.participante_nombre }}
                         </div>
                         <div class="field">
-                            <label for="{{ form.nombre_existente.id_for_label }}">{{ form.nombre_existente.label }}</label>
-                            {{ form.nombre_existente }}
+                            <label for="{{ form.participante_apellidos.id_for_label }}">{{ form.participante_apellidos.label }}</label>
+                            {{ form.participante_apellidos }}
                         </div>
                     </div>
 
                     <div class="field">
-                        <label for="{{ form.participante_nombre.id_for_label }}">{{ form.participante_nombre.label }}</label>
-                        {{ form.participante_nombre }}
+                        <label for="{{ form.dpi.id_for_label }}">{{ form.dpi.label }}</label>
+                        {{ form.dpi }}
+                        {% if form.dpi.help_text %}<small>{{ form.dpi.help_text }}</small>{% endif %}
                     </div>
 
                     <div class="row">
@@ -151,6 +151,17 @@
                         <div class="field">
                             <label for="{{ form.participante_telefono.id_for_label }}">{{ form.participante_telefono.label }}</label>
                             {{ form.participante_telefono }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="field">
+                            <label for="{{ form.participante_institucion.id_for_label }}">{{ form.participante_institucion.label }}</label>
+                            {{ form.participante_institucion }}
+                        </div>
+                        <div class="field">
+                            <label for="{{ form.participante_cargo.id_for_label }}">{{ form.participante_cargo.label }}</label>
+                            {{ form.participante_cargo }}
                         </div>
                     </div>
 
@@ -176,9 +187,9 @@
                 <ul class="support-list">
                     <li>Ubicación seleccionada: <strong id="supportLocationName">{{ selected_location.nombre|default:"Se mostrará al validar el curso" }}</strong>.</li>
                     <li>Use el código exacto del curso para validar la inscripción correcta.</li>
-                    <li>Puede escribir el DPI con espacios; el sistema lo normalizará para buscarlo.</li>
-                    <li>Si el participante ya existe, su nombre se mostrará automáticamente.</li>
-                    <li>Si aún no existe, complete los campos opcionales para dejar el registro más completo.</li>
+                    <li>Escriba manualmente los datos del participante; no se consultará el módulo Empleados.</li>
+                    <li>El DPI es opcional y se usa solo como dato registrado en Diplomas.</li>
+                    <li>Complete los campos opcionales para dejar el registro más completo.</li>
                 </ul>
             </aside>
         </div>
@@ -195,9 +206,6 @@
 
         const courseCodeInput = document.getElementById("{{ form.codigo_curso.id_for_label }}");
         const courseNameInput = document.getElementById("{{ form.nombre_curso.id_for_label }}");
-        const dpiInput = document.getElementById("{{ form.dpi.id_for_label }}");
-        const existingNameInput = document.getElementById("{{ form.nombre_existente.id_for_label }}");
-        const participantNameInput = document.getElementById("{{ form.participante_nombre.id_for_label }}");
         const selectedLocationName = document.getElementById("selectedLocationName");
         const supportLocationName = document.getElementById("supportLocationName");
         const publicRegistrationForm = document.getElementById("publicRegistrationForm");
@@ -226,27 +234,7 @@
             }
         }
 
-        async function refreshParticipant() {
-            if (!courseCodeInput || !dpiInput || !existingNameInput) return;
-            const code = (courseCodeInput.value || "").replace(/\s+/g, "");
-            const dpi = (dpiInput.value || "").replace(/\s+/g, "");
-            existingNameInput.value = "";
-            if (!code || !dpi) return;
-            try {
-                const data = await fetchJson(`{% url 'diplomas:public_buscar_participante_por_dpi' %}?codigo_curso=${encodeURIComponent(code)}&dpi=${encodeURIComponent(dpi)}`);
-                if (data.existe) {
-                    existingNameInput.value = data.nombre_completo || "";
-                    if (data.nombre_completo && !data.inscrito_en_curso && participantNameInput) {
-                        participantNameInput.value = data.nombre_completo;
-                    }
-                }
-            } catch (error) {
-                console.error("No fue posible validar el participante.", error);
-            }
-        }
-
         courseCodeInput?.addEventListener("blur", refreshCourse);
-        dpiInput?.addEventListener("blur", refreshParticipant);
 
         if (publicRegistrationForm) {
             publicRegistrationForm.addEventListener("keydown", function (event) {

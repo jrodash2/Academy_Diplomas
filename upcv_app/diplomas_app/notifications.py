@@ -14,9 +14,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 
-from empleados_app.models import ConfiguracionGeneral
-
-from .models import CursoEmpleado
+from .models import ConfiguracionGeneral, CursoEmpleado
 
 logger = logging.getLogger(__name__)
 

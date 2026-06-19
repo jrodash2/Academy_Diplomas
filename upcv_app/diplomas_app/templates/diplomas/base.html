@@ -252,25 +252,23 @@
               </div>
             </div>
                        
-            {% if frase_del_dia %}
             <div class="welcome-content d-xl-block d-none">
                 <span class="text-truncate col-12">
-                    {{ frase_del_dia.frase }}
-                    <i>- 
-                        {% if frase_del_dia.personaje == 'Unknown' %}
-                            Anónimo
-                        {% else %}
-                            {{ frase_del_dia.personaje }}
-                        {% endif %}
-                    </i>
+                    {% if frase_del_dia %}
+                        {{ frase_del_dia.frase }}
+                        <i>- 
+                            {% if frase_del_dia.personaje == 'Unknown' %}
+                                Anónimo
+                            {% else %}
+                                {{ frase_del_dia.personaje }}
+                            {% endif %}
+                        </i>
+                    {% else %}
+                        La educación abre puertas al futuro.
+                        <i>- Diplomas Academy</i>
+                    {% endif %}
                 </span>
             </div>
-            <div class="motivational-quote">
-        {% else %}
-        {% endif %}
-        
-             
-          </div>
           </div>
           <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
             <ul class="nav-menus"> 
@@ -395,6 +393,9 @@
                     {% if diplomas_scope.can_manage_locations %}
                     <li><a href="{% url 'diplomas:ubicaciones_lista' %}">Ubicaciones</a></li>
                     <li><a href="{% url 'diplomas:asignaciones_ubicacion_lista' %}">Asignaciones</a></li>
+                    <li><a href="{% url 'empleados:usuarios_list' %}">Usuarios</a></li>
+                    <li><a href="{% url 'empleados:usuario_crear' %}">Crear usuario</a></li>
+                    <li><a href="{% url 'diplomas:configuracion_general' %}">Configuración general</a></li>
                     {% endif %}
                   </ul>
                 </li>

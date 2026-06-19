@@ -98,24 +98,52 @@
         <div class="overflow-hidden text-center mb-4">
           <img class="img-fluid small-logo" src="{% static 'assets/images/logo/logo.png' %}" alt="">
         </div>
-        <form method="POST" action="{% url 'diplomas:crear_curso_modal' %}">
+        <form method="POST" action="{% url 'diplomas:crear_curso_modal' %}" novalidate>
           {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
           <div class="row">
             {% if form.ubicacion.is_hidden %}
               {{ form.ubicacion }}
+              {% for error in form.ubicacion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             {% else %}
-              <div class="col-md-12 mb-3">{{ form.ubicacion.label_tag }}{{ form.ubicacion }}</div>
+              <div class="col-md-12 mb-3">
+                {{ form.ubicacion.label_tag }}{{ form.ubicacion }}
+                {% for error in form.ubicacion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+              </div>
             {% endif %}
-            <div class="col-md-4 mb-3">{{ form.codigo.label_tag }}{{ form.codigo }}</div>
-            <div class="col-md-8 mb-3">{{ form.nombre.label_tag }}{{ form.nombre }}</div>
+            <div class="col-md-4 mb-3">
+              {{ form.codigo.label_tag }}{{ form.codigo }}
+              {% for error in form.codigo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-8 mb-3">
+              {{ form.nombre.label_tag }}{{ form.nombre }}
+              {% for error in form.nombre.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
             <div class="col-md-12 mb-3">
               {{ form.descripcion.label_tag }}{{ form.descripcion }}
+              {% for error in form.descripcion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
               <small class="text-muted">Puede usar <strong>**texto**</strong> o <strong>__texto__</strong> para mostrar partes en negrita dentro del diploma.</small>
             </div>
-            <div class="col-md-6 mb-3">{{ form.fecha_inicio.label_tag }}{{ form.fecha_inicio }}</div>
-            <div class="col-md-6 mb-3">{{ form.fecha_fin.label_tag }}{{ form.fecha_fin }}</div>
-            <div class="col-md-12 mb-3">{{ form.diseno_diploma.label_tag }}{{ form.diseno_diploma }}</div>
-            <div class="col-md-12 mb-3">{{ form.firmas.label_tag }}{{ form.firmas }}</div>
+            <div class="col-md-6 mb-3">
+              {{ form.fecha_inicio.label_tag }}{{ form.fecha_inicio }}
+              {% for error in form.fecha_inicio.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ form.fecha_fin.label_tag }}{{ form.fecha_fin }}
+              {% for error in form.fecha_fin.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-12 mb-3">
+              {{ form.diseno_diploma.label_tag }}{{ form.diseno_diploma }}
+              {% for error in form.diseno_diploma.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-12 mb-3">
+              {{ form.firmas.label_tag }}{{ form.firmas }}
+              {% for error in form.firmas.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
           </div>
           <div class="modal-footer justify-content-center border-top-0">
             <button type="submit" class="btn btn-primary">Guardar Curso</button>
@@ -126,4 +154,15 @@
     </div>
   </div>
 </div>
+
+{% if open_crear_curso_modal %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var modalElement = document.getElementById("modalCrearCurso");
+  if (modalElement && window.bootstrap) {
+    window.bootstrap.Modal.getOrCreateInstance(modalElement).show();
+  }
+});
+</script>
+{% endif %}
 {% endblock %}

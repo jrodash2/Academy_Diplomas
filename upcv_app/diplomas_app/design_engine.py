@@ -5,9 +5,7 @@ import string
 
 from django.utils import timezone
 
-from empleados_app.models import ConfiguracionGeneral
-
-from .models import Diploma, Firma
+from .models import ConfiguracionGeneral, Diploma, Firma
 
 
 CANVAS_WIDTH = 3508
@@ -752,8 +750,6 @@ def build_diploma_render_context(curso_empleado):
         "curso",
         "curso__ubicacion",
         "curso__diseno_diploma",
-        "empleado",
-        "empleado__datos_basicos",
         "diploma",
     ).get(pk=curso_empleado.pk)
     curso = curso_empleado.curso
