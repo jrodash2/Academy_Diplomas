@@ -113,7 +113,7 @@ def build_public_course_links(request, curso):
 
 
 def get_public_branding_context(course=None):
-    config = ConfiguracionGeneral.objects.first()
+    config = None
     selected_course = course
     selected_location = getattr(selected_course, "ubicacion", None) if selected_course else None
     enrollment_open, enrollment_message = get_course_enrollment_status(selected_course)
