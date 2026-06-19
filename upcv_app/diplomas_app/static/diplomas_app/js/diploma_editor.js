@@ -45,6 +45,7 @@
       texto: "",
       image_url: fallbackBackgroundUrl,
       shape: "rect",
+      campo: "",
     };
   }
   state.pristine = JSON.parse(JSON.stringify(state.elements));
@@ -84,6 +85,7 @@
     imageInput: document.getElementById("editorImageInput"),
     replaceImage: document.getElementById("editorReplaceImage"),
     uploadFeedback: document.getElementById("editorUploadFeedback"),
+    institutionFields: Array.from(document.querySelectorAll(".editor-institution-field")),
   };
 
   function csrfToken() {
@@ -178,6 +180,7 @@
     normalized.texto = normalized.texto || "";
     normalized.image_url = normalized.image_url || "";
     normalized.shape = normalized.shape || "rect";
+    normalized.campo = normalized.campo || normalized.field || "";
 
     if (normalized.key === "fondo_diploma") {
       normalized.x = 0;
@@ -301,6 +304,37 @@
       texto: "Nuevo texto",
       image_url: "",
       shape: "rect",
+      campo: "",
+    });
+  }
+
+  function createInstitutionalElement(config) {
+    const fieldType = config.type === "imagen" ? "imagen" : "texto";
+    const width = fieldType === "imagen" ? 420 : 900;
+    const height = fieldType === "imagen" ? 220 : 120;
+    const position = defaultPosition(width, height);
+    const key = generateUniqueKey((config.field || "configuracion").replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "") || "configuracion");
+    const token = config.token || "";
+    return normalizeElement({
+      key: key,
+      label: config.label || config.field || "Dato institucional",
+      type: fieldType,
+      visible: true,
+      x: position.x,
+      y: position.y,
+      width: width,
+      height: height,
+      font_size: fieldType === "imagen" ? 20 : 38,
+      font_family: 'Georgia, "Times New Roman", serif',
+      font_weight: fieldType === "imagen" ? "400" : "700",
+      color: "#111827",
+      align: "center",
+      z_index: nextZIndex(),
+      token: token,
+      texto: fieldType === "imagen" ? "" : token,
+      image_url: fieldType === "imagen" ? token : "",
+      shape: "rect",
+      campo: config.field || "",
     });
   }
 
@@ -328,6 +362,7 @@
       texto: "",
       image_url: imageUrl || "",
       shape: "rect",
+      campo: "",
     });
   }
 
@@ -543,6 +578,7 @@
     element.height = Number(ui.height.value || element.height);
     element.z_index = Number(ui.zIndex.value || element.z_index);
     element.visible = ui.visible.checked;
+    element.campo = element.campo || "";
 
     if (element.type !== "imagen") {
       element.texto = ui.texto.value;
@@ -749,6 +785,20 @@
       ui.imageInput.click();
     });
   }
+
+  ui.institutionFields.forEach(function (button) {
+    button.addEventListener("click", function () {
+      const newElement = createInstitutionalElement({
+        type: button.dataset.fieldType,
+        field: button.dataset.field,
+        label: button.dataset.label || button.textContent.trim(),
+        token: button.dataset.token,
+      });
+      state.elements[newElement.key] = newElement;
+      selectElement(newElement.key);
+      setFeedback("Dato institucional agregado al lienzo. Ajusta posición/tamaño y guarda el diseño.", "success");
+    });
+  });
 
   if (ui.replaceImage && ui.imageInput) {
     ui.replaceImage.addEventListener("click", function () {

@@ -14,17 +14,15 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 
-from empleados_app.models import ConfiguracionGeneral
-
-from .models import CursoEmpleado
+from .models import ConfiguracionGeneral, CursoEmpleado
 
 logger = logging.getLogger(__name__)
 
 
 def _build_course_context(participante, request=None):
     curso = participante.curso
-    configuracion = ConfiguracionGeneral.objects.first()
-    institucion = getattr(configuracion, "nombre_institucion", "UPCV") or "UPCV"
+    configuracion = ConfiguracionGeneral.get_solo()
+    institucion = (getattr(configuracion, "nombre_comercial", "") or getattr(configuracion, "nombre_institucion", "") or "ALI Academy")
     ubicacion = getattr(curso.ubicacion, "nombre", "Sin ubicación") if curso else "Sin ubicación"
 
     diploma_query = urlencode(

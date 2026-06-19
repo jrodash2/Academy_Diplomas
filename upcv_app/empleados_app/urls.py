@@ -10,6 +10,9 @@ urlpatterns = [
     path('logout/', views.signout, name='logout'),
     path('dahsboard/', views.dahsboard, name='dahsboard'),
     path('', views.home, name='home'),
+    path('usuarios/', views.usuarios_list, name='usuarios_list'),
+    path('usuarios/crear/', views.usuario_crear, name='usuario_crear'),
+    path('usuarios/<int:pk>/editar/', views.usuario_editar, name='usuario_editar'),
 
     # Configuración institucional mínima usada por Diplomas
     path('config_general/', views.configuracion_general, name='configuracion_general'),
