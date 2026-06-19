@@ -195,6 +195,15 @@ def trigger_course_completion_notifications(*_args, **_kwargs):
     return {"sent": 0, "skipped": 0, "errors": 0}
 
 
+def mark_form_error_fields(form):
+    for field_name in form.errors:
+        if field_name in form.fields:
+            css_classes = form.fields[field_name].widget.attrs.get("class", "")
+            if "is-invalid" not in css_classes.split():
+                form.fields[field_name].widget.attrs["class"] = f"{css_classes} is-invalid".strip()
+    return form
+
+
 # Dashboard
 
 @diplomas_access_required
@@ -555,7 +564,15 @@ def crear_curso_modal(request):
             form.save()
             messages.success(request, "Curso creado correctamente.")
             return redirect("diplomas:cursos_lista")
-        messages.error(request, "Corrige los errores del formulario.")
+
+        mark_form_error_fields(form)
+        cursos = scope_queryset(Curso.objects.select_related("ubicacion", "diseno_diploma"), scope).order_by("-creado_en")
+        messages.error(request, "Revise los campos marcados en el formulario de curso.")
+        return render_diplomas(
+            request,
+            "diplomas/cursos_lista.html",
+            {"cursos": cursos, "form": form, "open_crear_curso_modal": True},
+        )
     return redirect("diplomas:cursos_lista")
 
 

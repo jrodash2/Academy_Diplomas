@@ -359,7 +359,14 @@ class CursoForm(ScopedModelFormMixin, forms.ModelForm):
             location = (self.scope or {}).get("location")
             firmas = firmas.filter(ubicacion=location) if location else firmas.none()
             disenos = disenos.filter(ubicacion=location) if location else disenos.none()
+        self.fields["ubicacion"].empty_label = "Seleccione una ubicación"
+        self.fields["ubicacion"].error_messages["required"] = "Debe seleccionar una ubicación."
+        self.fields["codigo"].error_messages["required"] = "Debe ingresar el código del curso."
+        self.fields["nombre"].error_messages["required"] = "Debe ingresar el nombre del curso."
+        self.fields["fecha_inicio"].error_messages["required"] = "Debe ingresar la fecha de inicio."
+        self.fields["fecha_fin"].error_messages["required"] = "Debe ingresar la fecha de fin."
         self.fields["firmas"].queryset = firmas
+        self.fields["firmas"].required = False
         self.fields["firmas"].label = "Firmas que aparecerán en el diploma"
         self.fields["diseno_diploma"].queryset = disenos
         self.fields["diseno_diploma"].required = False
@@ -367,7 +374,9 @@ class CursoForm(ScopedModelFormMixin, forms.ModelForm):
         self.fields["diseno_diploma"].label = "Diseño de diploma"
 
     def clean_codigo(self):
-        codigo = self.cleaned_data.get("codigo")
+        codigo = str(self.cleaned_data.get("codigo") or "").strip()
+        if not codigo:
+            raise forms.ValidationError("Debe ingresar el código del curso.")
         if len(codigo) != 5 or not codigo.isdigit():
             raise forms.ValidationError("El código debe tener 5 dígitos.")
         return codigo
@@ -380,6 +389,11 @@ class CursoForm(ScopedModelFormMixin, forms.ModelForm):
 
         if ubicacion and diseno and diseno.ubicacion_id != ubicacion.id:
             self.add_error("diseno_diploma", "El diseño seleccionado no pertenece a la ubicación del curso.")
+
+        fecha_inicio = cleaned_data.get("fecha_inicio")
+        fecha_fin = cleaned_data.get("fecha_fin")
+        if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
+            self.add_error("fecha_fin", "La fecha de fin no puede ser anterior a la fecha de inicio.")
 
         if ubicacion and firmas:
             firmas_invalidas = [firma.nombre for firma in firmas if firma.ubicacion_id != ubicacion.id]
