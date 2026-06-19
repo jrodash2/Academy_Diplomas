@@ -61,6 +61,7 @@
         <div class="card-body diploma-editor-sidebar-body">
           <div class="editor-sidebar-tabs" role="tablist" aria-label="Panel lateral del editor">
             <button type="button" class="editor-sidebar-tab is-active" data-tab-target="layers" aria-selected="true">Capas</button>
+            <button type="button" class="editor-sidebar-tab" data-tab-target="institution" aria-selected="false">Datos institucionales</button>
             <button type="button" class="editor-sidebar-tab" data-tab-target="properties" aria-selected="false">Propiedades</button>
           </div>
 
@@ -79,6 +80,101 @@
             </div>
 
             <div class="editor-layer-list" id="editorLayerList"></div>
+          </section>
+
+
+          <section class="editor-sidebar-panel" data-tab-panel="institution">
+            <div class="institutional-panel">
+              <div class="institutional-panel-intro">
+                <span class="institutional-panel-icon"><i class="fa-solid fa-landmark"></i></span>
+                <div>
+                  <h5 class="mb-1">Datos institucionales</h5>
+                  <p class="text-muted small mb-0">Inserta campos dinámicos de Configuración institucional. Si la configuración cambia, el diploma se actualizará automáticamente.</p>
+                </div>
+              </div>
+
+              <div class="institutional-group">
+                <h6 class="institutional-title">Logos y firmas</h6>
+                <div class="institutional-grid">
+                <button type="button" class="btn-institutional-field" data-type="image" data-field="configuracion.logo_principal" data-label="Logo principal">
+                  <span class="institutional-field-icon"><i class="fa-regular fa-image"></i></span>
+                  <span class="institutional-field-label">Logo principal</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="image" data-field="configuracion.logo_secundario" data-label="Logo secundario">
+                  <span class="institutional-field-icon"><i class="fa-regular fa-images"></i></span>
+                  <span class="institutional-field-label">Logo secundario</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="image" data-field="configuracion.sello" data-label="Sello">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-certificate"></i></span>
+                  <span class="institutional-field-label">Sello</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="image" data-field="configuracion.firma_autoridad" data-label="Firma de autoridad">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-signature"></i></span>
+                  <span class="institutional-field-label">Firma de autoridad</span>
+                </button>
+                </div>
+              </div>
+
+              <div class="institutional-group">
+                <h6 class="institutional-title">Identidad institucional</h6>
+                <div class="institutional-grid">
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.nombre_institucion" data-label="Nombre de institución">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-building-columns"></i></span>
+                  <span class="institutional-field-label">Nombre de institución</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.nombre_comercial" data-label="Nombre comercial">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-id-badge"></i></span>
+                  <span class="institutional-field-label">Nombre comercial</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.abreviatura" data-label="Abreviatura">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-a"></i></span>
+                  <span class="institutional-field-label">Abreviatura</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.significado_abreviatura" data-label="Significado de abreviatura">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-spell-check"></i></span>
+                  <span class="institutional-field-label">Significado de abreviatura</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.descripcion" data-label="Descripción / enfoque">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-align-left"></i></span>
+                  <span class="institutional-field-label">Descripción / enfoque</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.slogan" data-label="Slogan">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-quote-right"></i></span>
+                  <span class="institutional-field-label">Slogan</span>
+                </button>
+                </div>
+              </div>
+
+              <div class="institutional-group">
+                <h6 class="institutional-title">Autoridad y contacto</h6>
+                <div class="institutional-grid">
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.nombre_autoridad" data-label="Nombre de autoridad">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-user-tie"></i></span>
+                  <span class="institutional-field-label">Nombre de autoridad</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.cargo_autoridad" data-label="Cargo de autoridad">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-briefcase"></i></span>
+                  <span class="institutional-field-label">Cargo de autoridad</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.correo" data-label="Correo">
+                  <span class="institutional-field-icon"><i class="fa-regular fa-envelope"></i></span>
+                  <span class="institutional-field-label">Correo</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.telefono" data-label="Teléfono">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-phone"></i></span>
+                  <span class="institutional-field-label">Teléfono</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.sitio_web" data-label="Sitio web">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-globe"></i></span>
+                  <span class="institutional-field-label">Sitio web</span>
+                </button>
+                <button type="button" class="btn-institutional-field" data-type="text" data-field="configuracion.direccion" data-label="Dirección">
+                  <span class="institutional-field-icon"><i class="fa-solid fa-location-dot"></i></span>
+                  <span class="institutional-field-label">Dirección</span>
+                </button>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section class="editor-sidebar-panel" data-tab-panel="properties">
@@ -201,5 +297,6 @@
 
 {{ elementos_json|json_script:"diplomaDesignDefinition" }}
 {{ preview_context_json|json_script:"diplomaPreviewContext" }}
+{{ configuracion_json|json_script:"configuracion-data" }}
 <script src="{% static 'diplomas_app/js/diploma_editor.js' %}"></script>
 {% endblock %}
