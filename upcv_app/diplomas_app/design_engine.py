@@ -5,8 +5,6 @@ import string
 
 from django.utils import timezone
 
-from empleados_app.models import ConfiguracionGeneral
-
 from .models import Diploma, Firma
 
 
@@ -316,7 +314,7 @@ def build_signature_elements(firmas, signature_slots):
 
 
 def build_base_elements(diseno=None, firmas=None, signature_slots=2):
-    config = ConfiguracionGeneral.objects.first()
+    config = None
     firmas = firmas if firmas is not None else get_design_signatures(diseno)
 
     base_elements = {
@@ -643,7 +641,7 @@ def render_text_content(element_key, resolved_text):
 
 
 def build_token_context_map(*, curso=None, curso_empleado=None, config=None, firmas=None, sample=False):
-    config = config if config is not None else ConfiguracionGeneral.objects.first()
+    config = config if config is not None else None
     firmas = firmas if firmas is not None else get_course_signatures(curso)
 
     participante_nombre = "NOMBRE DEL PARTICIPANTE"
@@ -693,7 +691,7 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
 def build_design_editor_payload(diseno, firmas=None):
     firmas = firmas if firmas is not None else get_design_signatures(diseno)
     definition = build_design_definition(diseno, None, firmas=firmas)
-    preview_context = build_token_context_map(config=ConfiguracionGeneral.objects.first(), firmas=firmas, sample=True)
+    preview_context = build_token_context_map(config=None, firmas=firmas, sample=True)
     return {
         "definition": definition,
         "preview_context": preview_context,
@@ -752,12 +750,10 @@ def build_diploma_render_context(curso_empleado):
         "curso",
         "curso__ubicacion",
         "curso__diseno_diploma",
-        "empleado",
-        "empleado__datos_basicos",
         "diploma",
     ).get(pk=curso_empleado.pk)
     curso = curso_empleado.curso
-    config = ConfiguracionGeneral.objects.first()
+    config = None
     firmas = get_course_signatures(curso)
     definition = build_course_design_definition(curso, firmas=firmas)
     context_map = build_token_context_map(
