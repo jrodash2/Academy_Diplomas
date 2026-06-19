@@ -61,6 +61,7 @@
         <div class="card-body diploma-editor-sidebar-body">
           <div class="editor-sidebar-tabs" role="tablist" aria-label="Panel lateral del editor">
             <button type="button" class="editor-sidebar-tab is-active" data-tab-target="layers" aria-selected="true">Capas</button>
+            <button type="button" class="editor-sidebar-tab" data-tab-target="institution" aria-selected="false">Datos institucionales</button>
             <button type="button" class="editor-sidebar-tab" data-tab-target="properties" aria-selected="false">Propiedades</button>
           </div>
 
@@ -79,6 +80,44 @@
             </div>
 
             <div class="editor-layer-list" id="editorLayerList"></div>
+          </section>
+
+
+          <section class="editor-sidebar-panel" data-tab-panel="institution">
+            <div class="diploma-sidebar-heading">
+              <div>
+                <h5 class="mb-1">Datos institucionales</h5>
+                <p class="mb-0 text-muted small">Inserta campos dinámicos de Configuración institucional; se actualizarán automáticamente al cambiar la configuración.</p>
+              </div>
+            </div>
+
+            <div class="editor-institution-field-group">
+              <h6>Logos y firmas</h6>
+              <button type="button" class="editor-institution-field" data-field-type="imagen" data-field="configuracion.logo_principal" data-label="Logo principal" data-token="{% templatetag openvariable %}configuracion.logo_principal{% templatetag closevariable %}">Logo principal</button>
+              <button type="button" class="editor-institution-field" data-field-type="imagen" data-field="configuracion.logo_secundario" data-label="Logo secundario" data-token="{% templatetag openvariable %}configuracion.logo_secundario{% templatetag closevariable %}">Logo secundario</button>
+              <button type="button" class="editor-institution-field" data-field-type="imagen" data-field="configuracion.sello" data-label="Sello" data-token="{% templatetag openvariable %}configuracion.sello{% templatetag closevariable %}">Sello</button>
+              <button type="button" class="editor-institution-field" data-field-type="imagen" data-field="configuracion.firma_autoridad" data-label="Firma de autoridad" data-token="{% templatetag openvariable %}configuracion.firma_autoridad{% templatetag closevariable %}">Firma de autoridad</button>
+            </div>
+
+            <div class="editor-institution-field-group">
+              <h6>Identidad institucional</h6>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.nombre_institucion" data-label="Nombre de institución" data-token="{% templatetag openvariable %}configuracion.nombre_institucion{% templatetag closevariable %}">Nombre de institución</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.nombre_comercial" data-label="Nombre comercial" data-token="{% templatetag openvariable %}configuracion.nombre_comercial{% templatetag closevariable %}">Nombre comercial</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.abreviatura" data-label="Abreviatura" data-token="{% templatetag openvariable %}configuracion.abreviatura{% templatetag closevariable %}">Abreviatura</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.significado_abreviatura" data-label="Significado de abreviatura" data-token="{% templatetag openvariable %}configuracion.significado_abreviatura{% templatetag closevariable %}">Significado de abreviatura</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.descripcion" data-label="Descripción / enfoque" data-token="{% templatetag openvariable %}configuracion.descripcion{% templatetag closevariable %}">Descripción / enfoque</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.slogan" data-label="Slogan" data-token="{% templatetag openvariable %}configuracion.slogan{% templatetag closevariable %}">Slogan</button>
+            </div>
+
+            <div class="editor-institution-field-group">
+              <h6>Autoridad y contacto</h6>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.nombre_autoridad" data-label="Nombre de autoridad" data-token="{% templatetag openvariable %}configuracion.nombre_autoridad{% templatetag closevariable %}">Nombre de autoridad</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.cargo_autoridad" data-label="Cargo de autoridad" data-token="{% templatetag openvariable %}configuracion.cargo_autoridad{% templatetag closevariable %}">Cargo de autoridad</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.correo" data-label="Correo" data-token="{% templatetag openvariable %}configuracion.correo{% templatetag closevariable %}">Correo</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.telefono" data-label="Teléfono" data-token="{% templatetag openvariable %}configuracion.telefono{% templatetag closevariable %}">Teléfono</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.sitio_web" data-label="Sitio web" data-token="{% templatetag openvariable %}configuracion.sitio_web{% templatetag closevariable %}">Sitio web</button>
+              <button type="button" class="editor-institution-field" data-field-type="texto" data-field="configuracion.direccion" data-label="Dirección" data-token="{% templatetag openvariable %}configuracion.direccion{% templatetag closevariable %}">Dirección</button>
+            </div>
           </section>
 
           <section class="editor-sidebar-panel" data-tab-panel="properties">

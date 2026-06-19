@@ -531,6 +531,52 @@ class DiplomasScopeTests(TestCase):
         render_map = {item["key"]: item for item in render_context["render_elements"]}
         self.assertEqual(render_map["titulo_institucional"]["rendered_value"], "ALI Actualizada")
 
+
+    def test_dynamic_institutional_editor_fields_resolve_from_configuracion(self):
+        self.configuracion.nombre_comercial = "ALI Dinámica"
+        self.configuracion.slogan = "Slogan dinámico"
+        self.configuracion.logo_principal = "configuracion/logos/logo-ali.png"
+        self.configuracion.save(update_fields=["nombre_comercial", "slogan", "logo_principal"])
+        self.diseno_a.estilos = {
+            "version": 2,
+            "canvas": {"width": 3508, "height": 2480},
+            "elements": {
+                "config_nombre_comercial_demo": {
+                    "key": "config_nombre_comercial_demo",
+                    "label": "Nombre comercial",
+                    "type": "texto",
+                    "token": "{{ configuracion.nombre_comercial }}",
+                    "texto": "{{ configuracion.nombre_comercial }}",
+                    "campo": "configuracion.nombre_comercial",
+                    "x": 100,
+                    "y": 100,
+                    "width": 900,
+                    "height": 120,
+                    "z_index": 80,
+                },
+                "config_logo_principal_demo": {
+                    "key": "config_logo_principal_demo",
+                    "label": "Logo principal",
+                    "type": "imagen",
+                    "token": "{{ configuracion.logo_principal }}",
+                    "image_url": "{{ configuracion.logo_principal }}",
+                    "campo": "configuracion.logo_principal",
+                    "x": 100,
+                    "y": 240,
+                    "width": 300,
+                    "height": 180,
+                    "z_index": 81,
+                },
+            },
+        }
+        self.diseno_a.save(update_fields=["estilos"])
+
+        render_context = build_diploma_render_context(self.participante)
+        render_map = {item["key"]: item for item in render_context["render_elements"]}
+        self.assertEqual(render_map["config_nombre_comercial_demo"]["rendered_value"], "ALI Dinámica")
+        self.assertIn("/media/configuracion/logos/logo-ali.png", render_map["config_logo_principal_demo"]["image_url"])
+        self.assertEqual(self.diseno_a.estilos["elements"]["config_nombre_comercial_demo"]["campo"], "configuracion.nombre_comercial")
+
     def test_signature_updates_and_removed_slots_are_resolved_dynamically(self):
         self.diseno_a.estilos = {
             "version": 2,

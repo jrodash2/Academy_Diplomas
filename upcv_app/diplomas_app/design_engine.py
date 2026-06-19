@@ -105,6 +105,7 @@ def _base_element(
     align="center",
     visible=True,
     shape="rect",
+    campo="",
 ):
     return {
         "key": key,
@@ -125,6 +126,7 @@ def _base_element(
         "texto": texto,
         "image_url": image_url,
         "shape": shape,
+        "campo": campo,
     }
 
 
@@ -155,6 +157,7 @@ def build_custom_element_fallback(key, raw_element):
         align=raw.get("align") or "center",
         visible=bool(raw.get("visible", True)),
         shape=raw.get("shape") or "rect",
+        campo=raw.get("campo") or raw.get("field") or "",
     )
 
 SIGNATURE_KEY_PATTERN = re.compile(r"^firma_(\d+)_(imagen|nombre|cargo)$")
@@ -525,6 +528,7 @@ def normalize_element(key, raw_element, fallback_element):
         "texto": raw.get("texto") or raw.get("content") or fallback["texto"],
         "image_url": raw.get("image_url") or fallback["image_url"],
         "shape": raw.get("shape") or fallback.get("shape", "rect"),
+        "campo": raw.get("campo") or raw.get("field") or fallback.get("campo", ""),
     }
     if is_dynamic_text_key(key):
         normalized["texto"] = fallback["texto"]
@@ -669,6 +673,27 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
     if curso_empleado is not None:
         participante_foto = getattr(curso_empleado, "foto_participante_url", "") or ""
 
+    config_values = {
+        "nombre_institucion": config.nombre_institucion if config else "Academia de Liderazgo, Innovación y Desarrollo Personal",
+        "nombre_comercial": config.nombre_comercial if config else "ALI Academy",
+        "abreviatura": config.abreviatura if config else "ALI",
+        "significado_abreviatura": config.significado_abreviatura if config else "Academia de Liderazgo e Innovación",
+        "descripcion": config.descripcion if config else "Con enfoque en desarrollo personal, tecnología e inteligencia artificial.",
+        "slogan": config.slogan if config else "Formamos personas, impulsamos líderes y conectamos con el futuro.",
+        "nombre_autoridad": config.nombre_autoridad if config else "",
+        "cargo_autoridad": config.cargo_autoridad if config else "",
+        "correo": config.correo if config else "",
+        "telefono": config.telefono if config else "",
+        "sitio_web": config.sitio_web if config else "",
+        "direccion": config.direccion if config else "",
+    }
+    config_images = {
+        "logo_principal": media_url(getattr(config, "logo_principal", None)) if config else "",
+        "logo_secundario": media_url(getattr(config, "logo_secundario", None)) if config else "",
+        "sello": media_url(getattr(config, "sello", None)) if config else "",
+        "firma_autoridad": media_url(getattr(config, "firma_autoridad", None)) if config else "",
+    }
+
     context = {
         "{{ participante_nombre }}": participante_nombre,
         "{{ foto_participante }}": participante_foto,
@@ -676,22 +701,26 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
         "{{ descripcion_curso }}": descripcion_curso,
         "{{ codigo }}": codigo,
         "{{ fecha }}": timezone.now().strftime("%Y"),
-        "{{ institucion_nombre }}": config.nombre_institucion if config else "Academia de Liderazgo, Innovación y Desarrollo Personal",
-        "{{ institucion_comercial }}": config.nombre_comercial if config else "ALI Academy",
-        "{{ institucion_abreviatura }}": config.abreviatura if config else "ALI",
-        "{{ institucion_significado }}": config.significado_abreviatura if config else "Academia de Liderazgo e Innovación",
-        "{{ institucion_descripcion }}": config.descripcion if config else "Con enfoque en desarrollo personal, tecnología e inteligencia artificial.",
-        "{{ institucion_slogan }}": config.slogan if config else "Formamos personas, impulsamos líderes y conectamos con el futuro.",
-        "{{ nombre_autoridad }}": config.nombre_autoridad if config else "",
-        "{{ cargo_autoridad }}": config.cargo_autoridad if config else "",
+        "{{ institucion_nombre }}": config_values["nombre_institucion"],
+        "{{ institucion_comercial }}": config_values["nombre_comercial"],
+        "{{ institucion_abreviatura }}": config_values["abreviatura"],
+        "{{ institucion_significado }}": config_values["significado_abreviatura"],
+        "{{ institucion_descripcion }}": config_values["descripcion"],
+        "{{ institucion_slogan }}": config_values["slogan"],
+        "{{ nombre_autoridad }}": config_values["nombre_autoridad"],
+        "{{ cargo_autoridad }}": config_values["cargo_autoridad"],
         "{{ subtitulo_diploma }}": "OTORGA EL PRESENTE DIPLOMA A:",
         "{{ adorno_central }}": "──────────── ✦ ────────────",
-        "{{ logo_secundario }}": media_url(getattr(config, "logo_secundario", None)) if config else "",
-        "{{ logo_principal }}": media_url(getattr(config, "logo_principal", None)) if config else "",
-        "{{ sello }}": media_url(getattr(config, "sello", None)) if config else "",
-        "{{ firma_autoridad }}": media_url(getattr(config, "firma_autoridad", None)) if config else "",
+        "{{ logo_secundario }}": config_images["logo_secundario"],
+        "{{ logo_principal }}": config_images["logo_principal"],
+        "{{ sello }}": config_images["sello"],
+        "{{ firma_autoridad }}": config_images["firma_autoridad"],
         "{{ fondo_diploma }}": "",
     }
+    for field, value in config_values.items():
+        context[f"{{{{ configuracion.{field} }}}}"] = value or ""
+    for field, value in config_images.items():
+        context[f"{{{{ configuracion.{field} }}}}"] = value or ""
     for index, firma in enumerate(firmas, start=1):
         context[f"{{{{ firma_{index}_nombre }}}}"] = getattr(firma, "nombre", "") or ""
         context[f"{{{{ firma_{index}_cargo }}}}"] = getattr(firma, "rol", "") or ""
