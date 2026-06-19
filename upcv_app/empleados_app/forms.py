@@ -249,3 +249,98 @@ class PuestoForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'sede': forms.Select(attrs={'class': 'form-control'}),
         }                
+
+
+class UsuarioSistemaForm(forms.ModelForm):
+    password = forms.CharField(
+        label="Contraseña",
+        required=True,
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+    )
+    password_confirm = forms.CharField(
+        label="Confirmar contraseña",
+        required=True,
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+    )
+    group = forms.ModelChoiceField(
+        label="Grupo o rol",
+        queryset=Group.objects.all().order_by("name"),
+        required=True,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        empty_label="Seleccione un grupo",
+    )
+    is_active = forms.BooleanField(
+        label="Usuario activo",
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email", "is_active"]
+        widgets = {
+            "username": forms.TextInput(attrs={"class": "form-control"}),
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+        }
+        labels = {
+            "username": "Nombre de usuario",
+            "first_name": "Nombres",
+            "last_name": "Apellidos",
+            "email": "Correo",
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.editing = kwargs.pop("editing", False)
+        super().__init__(*args, **kwargs)
+        if self.editing:
+            self.fields["password"].required = False
+            self.fields["password_confirm"].required = False
+            self.fields["password"].help_text = "Deje en blanco para conservar la contraseña actual."
+            if self.instance and self.instance.pk and self.instance.groups.exists():
+                self.fields["group"].initial = self.instance.groups.first()
+
+    def clean_username(self):
+        username = (self.cleaned_data.get("username") or "").strip()
+        qs = User.objects.filter(username__iexact=username)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError("Ya existe un usuario con ese nombre de usuario.")
+        return username
+
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip()
+        if email:
+            qs = User.objects.filter(email__iexact=email)
+            if self.instance and self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError("Ya existe un usuario con ese correo.")
+        return email
+
+    def clean(self):
+        cleaned = super().clean()
+        password = cleaned.get("password")
+        confirm = cleaned.get("password_confirm")
+        if not self.editing and not password:
+            self.add_error("password", "Debe ingresar una contraseña.")
+        if password or confirm:
+            if password != confirm:
+                self.add_error("password_confirm", "Las contraseñas no coinciden.")
+        if not cleaned.get("group"):
+            self.add_error("group", "Debe seleccionar un grupo.")
+        return cleaned
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get("password")
+        if password:
+            user.set_password(password)
+        if commit:
+            user.save()
+            group = self.cleaned_data.get("group")
+            user.groups.set([group] if group else [])
+        return user

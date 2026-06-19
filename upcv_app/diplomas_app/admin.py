@@ -1,6 +1,17 @@
 from django.contrib import admin
 
-from .models import Curso, CursoEmpleado, Diploma, DisenoDiploma, Firma, FraseMotivacional, UbicacionDiploma
+from .models import ConfiguracionGeneral, Curso, CursoEmpleado, Diploma, DisenoDiploma, Firma, FraseMotivacional, UbicacionDiploma
+
+
+@admin.register(ConfiguracionGeneral)
+class ConfiguracionGeneralAdmin(admin.ModelAdmin):
+    list_display = ("nombre_institucion", "correo", "telefono", "actualizado")
+    search_fields = ("nombre_institucion", "correo", "telefono")
+
+    def has_add_permission(self, request):
+        if ConfiguracionGeneral.objects.exists():
+            return False
+        return super().has_add_permission(request)
 
 
 @admin.register(FraseMotivacional)

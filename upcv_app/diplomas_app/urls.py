@@ -10,6 +10,7 @@ urlpatterns = [
     path("publico/ajax/curso/", views.public_buscar_curso_por_codigo, name="public_buscar_curso_por_codigo"),
 
     path("dashboard/", views.diplomas_dahsboard, name="diplomas_dahsboard"),
+    path("configuracion/", views.configuracion_general, name="configuracion_general"),
 
     path("ubicaciones/", views.ubicaciones_lista, name="ubicaciones_lista"),
     path("ubicaciones/crear/", views.crear_ubicacion, name="crear_ubicacion"),

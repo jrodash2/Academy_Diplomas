@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from .models import (
+    ConfiguracionGeneral,
     Curso,
     CursoEmpleado,
     DisenoDiploma,
@@ -43,6 +44,41 @@ class ScopedModelFormMixin:
                 raise forms.ValidationError("Su usuario no tiene una ubicación asignada.")
             cleaned_data[self.scope_field_name] = location
         return cleaned_data
+
+
+class ConfiguracionGeneralForm(forms.ModelForm):
+    class Meta:
+        model = ConfiguracionGeneral
+        fields = [
+            "nombre_institucion",
+            "direccion",
+            "telefono",
+            "correo",
+            "sitio_web",
+            "logotipo",
+            "logotipo2",
+            "sello",
+            "nombre_autoridad",
+            "cargo_autoridad",
+            "firma_autoridad",
+        ]
+        widgets = {
+            "nombre_institucion": forms.TextInput(attrs={"class": "form-control"}),
+            "direccion": forms.TextInput(attrs={"class": "form-control"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control"}),
+            "correo": forms.EmailInput(attrs={"class": "form-control"}),
+            "sitio_web": forms.URLInput(attrs={"class": "form-control"}),
+            "logotipo": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "logotipo2": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "sello": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "nombre_autoridad": forms.TextInput(attrs={"class": "form-control"}),
+            "cargo_autoridad": forms.TextInput(attrs={"class": "form-control"}),
+            "firma_autoridad": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }
+        labels = {
+            "logotipo": "Logo institucional",
+            "logotipo2": "Logo secundario",
+        }
 
 
 class UbicacionDiplomaForm(forms.ModelForm):

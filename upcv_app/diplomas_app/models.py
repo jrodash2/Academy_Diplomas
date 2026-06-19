@@ -24,6 +24,33 @@ def default_location_abbreviation(name):
     return compact or "GENERAL"
 
 
+class ConfiguracionGeneral(models.Model):
+    nombre_institucion = models.CharField(max_length=200, default="Unidad para la Prevención Comunitaria de la Violencia")
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    telefono = models.CharField(max_length=50, blank=True, null=True)
+    correo = models.EmailField(blank=True, null=True)
+    sitio_web = models.URLField(blank=True, null=True)
+    logotipo = models.ImageField(upload_to="configuracion/logos/", blank=True, null=True)
+    logotipo2 = models.ImageField(upload_to="configuracion/logos/", blank=True, null=True)
+    sello = models.ImageField(upload_to="configuracion/sellos/", blank=True, null=True)
+    firma_autoridad = models.ImageField(upload_to="configuracion/firmas/", blank=True, null=True)
+    nombre_autoridad = models.CharField(max_length=150, blank=True, null=True)
+    cargo_autoridad = models.CharField(max_length=150, blank=True, null=True)
+    actualizado = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Configuración general"
+        verbose_name_plural = "Configuración general"
+
+    def __str__(self):
+        return self.nombre_institucion
+
+    @classmethod
+    def get_solo(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+
 class FraseMotivacional(models.Model):
     frase = models.CharField(max_length=500)
     personaje = models.CharField(max_length=100)

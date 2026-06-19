@@ -1,0 +1,77 @@
+{% extends 'diplomas/base.html' %}
+
+{% block content %}
+<div class="page-body">
+  <div class="container-fluid">
+    <div class="card mt-3 shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="mb-1">Configuración general</h4>
+            <p class="text-muted mb-0">Datos institucionales usados por Diplomas.</p>
+          </div>
+          <span class="badge bg-primary">Registro único</span>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <div class="row g-3">
+            <div class="col-md-12">
+              {{ form.nombre_institucion.label_tag }}{{ form.nombre_institucion }}
+              {% for error in form.nombre_institucion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-12">
+              {{ form.direccion.label_tag }}{{ form.direccion }}
+              {% for error in form.direccion.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-4">
+              {{ form.telefono.label_tag }}{{ form.telefono }}
+              {% for error in form.telefono.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-4">
+              {{ form.correo.label_tag }}{{ form.correo }}
+              {% for error in form.correo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-4">
+              {{ form.sitio_web.label_tag }}{{ form.sitio_web }}
+              {% for error in form.sitio_web.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.nombre_autoridad.label_tag }}{{ form.nombre_autoridad }}
+              {% for error in form.nombre_autoridad.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.cargo_autoridad.label_tag }}{{ form.cargo_autoridad }}
+              {% for error in form.cargo_autoridad.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.logotipo.label_tag }}{{ form.logotipo }}
+              {% for error in form.logotipo.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.logotipo2.label_tag }}{{ form.logotipo2 }}
+              {% for error in form.logotipo2.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.sello.label_tag }}{{ form.sello }}
+              {% for error in form.sello.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              {{ form.firma_autoridad.label_tag }}{{ form.firma_autoridad }}
+              {% for error in form.firma_autoridad.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+          </div>
+
+          <div class="text-end mt-4">
+            <button class="btn btn-primary" type="submit">Guardar configuración</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

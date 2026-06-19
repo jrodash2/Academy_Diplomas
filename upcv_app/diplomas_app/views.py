@@ -31,6 +31,7 @@ from .design_engine import (
     normalize_definition_from_elements,
 )
 from .forms import (
+    ConfiguracionGeneralForm,
     CursoForm,
     DisenoDiplomaForm,
     EditarParticipanteCursoForm,
@@ -43,6 +44,7 @@ from .forms import (
     UsuarioUbicacionDiplomaForm,
 )
 from .models import (
+    ConfiguracionGeneral,
     Curso,
     CursoEmpleado,
     DisenoDiploma,
@@ -203,6 +205,24 @@ def mark_form_error_fields(form):
                 form.fields[field_name].widget.attrs["class"] = f"{css_classes} is-invalid".strip()
     return form
 
+
+
+
+@diplomas_access_required
+def configuracion_general(request):
+    if not request.user.groups.filter(name="Diplomas").exists():
+        raise PermissionDenied("Solo el grupo Diplomas puede editar la configuración general.")
+    configuracion = ConfiguracionGeneral.get_solo()
+    if request.method == "POST":
+        form = ConfiguracionGeneralForm(request.POST, request.FILES, instance=configuracion)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Configuración general actualizada correctamente.")
+            return redirect("diplomas:configuracion_general")
+        messages.error(request, "Corrija los errores del formulario de configuración.")
+    else:
+        form = ConfiguracionGeneralForm(instance=configuracion)
+    return render_diplomas(request, "diplomas/configuracion_general.html", {"form": form, "configuracion": configuracion})
 
 # Dashboard
 

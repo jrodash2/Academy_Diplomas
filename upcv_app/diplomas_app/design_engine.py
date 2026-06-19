@@ -5,7 +5,7 @@ import string
 
 from django.utils import timezone
 
-from .models import Diploma, Firma
+from .models import ConfiguracionGeneral, Diploma, Firma
 
 
 CANVAS_WIDTH = 3508

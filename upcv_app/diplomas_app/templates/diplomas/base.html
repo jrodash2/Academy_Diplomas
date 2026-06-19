@@ -393,6 +393,9 @@
                     {% if diplomas_scope.can_manage_locations %}
                     <li><a href="{% url 'diplomas:ubicaciones_lista' %}">Ubicaciones</a></li>
                     <li><a href="{% url 'diplomas:asignaciones_ubicacion_lista' %}">Asignaciones</a></li>
+                    <li><a href="{% url 'empleados:usuarios_list' %}">Usuarios</a></li>
+                    <li><a href="{% url 'empleados:usuario_crear' %}">Crear usuario</a></li>
+                    <li><a href="{% url 'diplomas:configuracion_general' %}">Configuración general</a></li>
                     {% endif %}
                   </ul>
                 </li>

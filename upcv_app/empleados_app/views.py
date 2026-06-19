@@ -575,3 +575,60 @@ def empleado_detalle(request, id):
         'empleado': empleado,
         'configuracion': configuracion,
     })
+
+from django.core.exceptions import PermissionDenied
+from diplomas_app.utils import attach_diplomas_context
+from .forms import UsuarioSistemaForm
+
+
+def es_grupo_diplomas(user):
+    return bool(user and user.is_authenticated and user.groups.filter(name="Diplomas").exists())
+
+
+def grupo_diplomas_required(view_func):
+    def _wrapped(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("empleados:signin")
+        if not es_grupo_diplomas(request.user):
+            raise PermissionDenied("Solo el grupo Diplomas puede acceder a esta vista.")
+        return view_func(request, *args, **kwargs)
+    return _wrapped
+
+
+def render_empleados_diplomas(request, template_name, context=None):
+    return render(request, template_name, attach_diplomas_context(context or {}, request))
+
+
+@grupo_diplomas_required
+def usuarios_list(request):
+    users = User.objects.prefetch_related("groups").order_by("username")
+    return render_empleados_diplomas(request, "empleados/usuarios_list.html", {"users": users})
+
+
+@grupo_diplomas_required
+def usuario_crear(request):
+    if request.method == "POST":
+        form = UsuarioSistemaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Usuario creado correctamente.")
+            return redirect("empleados:usuarios_list")
+        messages.error(request, "Corrija los errores del formulario de usuario.")
+    else:
+        form = UsuarioSistemaForm()
+    return render_empleados_diplomas(request, "empleados/usuario_form.html", {"form": form, "modo": "crear"})
+
+
+@grupo_diplomas_required
+def usuario_editar(request, pk):
+    usuario = get_object_or_404(User, pk=pk)
+    if request.method == "POST":
+        form = UsuarioSistemaForm(request.POST, instance=usuario, editing=True)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Usuario actualizado correctamente.")
+            return redirect("empleados:usuarios_list")
+        messages.error(request, "Corrija los errores del formulario de usuario.")
+    else:
+        form = UsuarioSistemaForm(instance=usuario, editing=True)
+    return render_empleados_diplomas(request, "empleados/usuario_form.html", {"form": form, "modo": "editar", "usuario": usuario})
