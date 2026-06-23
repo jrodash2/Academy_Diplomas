@@ -17,12 +17,12 @@
     "configuracion.significado_abreviatura": "Academia de Liderazgo e Innovación",
     "configuracion.descripcion": "Con enfoque en desarrollo personal, tecnología e inteligencia artificial.",
     "configuracion.slogan": "Formamos personas, impulsamos líderes y conectamos con el futuro.",
-    "configuracion.nombre_autoridad": "Nombre de autoridad",
-    "configuracion.cargo_autoridad": "Cargo de autoridad",
-    "configuracion.correo": "correo@aliacademy.com",
-    "configuracion.telefono": "Teléfono institucional",
-    "configuracion.sitio_web": "www.aliacademy.com",
-    "configuracion.direccion": "Dirección institucional",
+    "configuracion.nombre_autoridad": "",
+    "configuracion.cargo_autoridad": "",
+    "configuracion.correo": "",
+    "configuracion.telefono": "",
+    "configuracion.sitio_web": "",
+    "configuracion.direccion": "",
     "configuracion.logo_principal": "",
     "configuracion.logo_secundario": "",
     "configuracion.sello": "",
@@ -200,7 +200,13 @@
     normalized.texto = normalized.texto || "";
     normalized.image_url = normalized.image_url || "";
     normalized.shape = normalized.shape || "rect";
-    normalized.campo = normalized.campo || normalized.field || "";
+    normalized.campo = normalizarCampoDinamico(normalized.campo || normalized.field || "");
+    if (!normalized.campo) {
+      const candidate = normalizarCampoDinamico(normalized.type === "imagen" ? normalized.image_url : normalized.texto);
+      if (candidate.indexOf("configuracion.") === 0) {
+        normalized.campo = candidate;
+      }
+    }
     normalized.dynamicType = normalized.dynamicType || normalized.dynamic_type || "";
 
     if (normalized.key === "fondo_diploma") {
@@ -219,15 +225,23 @@
     });
   }
 
-  function institutionalValue(field) {
-    if (!field) {
+  function normalizarCampoDinamico(valor) {
+    if (!valor) {
       return "";
     }
-    const configured = configuracionData[field];
+    return String(valor).replace("{{", "").replace("}}", "").trim();
+  }
+
+  function institutionalValue(field) {
+    const normalizedField = normalizarCampoDinamico(field);
+    if (!normalizedField) {
+      return "";
+    }
+    const configured = configuracionData[normalizedField];
     if (configured) {
       return configured;
     }
-    return institutionalFallbacks[field] || "";
+    return institutionalFallbacks[normalizedField] || "";
   }
 
   function tokenForField(field) {
@@ -391,6 +405,7 @@
       image_url: fieldType === "imagen" ? token : "",
       shape: "rect",
       campo: config.field || "",
+      field: config.field || "",
       dynamicType: "institutional",
     });
   }
