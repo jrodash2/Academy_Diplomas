@@ -5,7 +5,51 @@ import string
 
 from django.utils import timezone
 
-from .models import ConfiguracionGeneral, Diploma, Firma
+from .models import ConfiguracionGeneral, Diploma, Firma, ALI_ABREVIATURA
+
+
+CONFIGURACION_DEFAULTS = {
+    "configuracion.nombre_institucion": "Academia de Liderazgo, Innovación y Desarrollo Personal",
+    "configuracion.nombre_comercial": "ALI Academy",
+    "configuracion.abreviatura": ALI_ABREVIATURA,
+    "configuracion.significado_abreviatura": "Academia de Liderazgo e Innovación",
+    "configuracion.descripcion": "Con enfoque en desarrollo personal, tecnología e inteligencia artificial.",
+    "configuracion.slogan": "Formamos personas, impulsamos líderes y conectamos con el futuro.",
+    "configuracion.nombre_autoridad": "",
+    "configuracion.cargo_autoridad": "",
+    "configuracion.correo": "",
+    "configuracion.telefono": "",
+    "configuracion.sitio_web": "",
+    "configuracion.direccion": "",
+    "configuracion.logo_principal": "",
+    "configuracion.logo_secundario": "",
+    "configuracion.sello": "",
+    "configuracion.firma_autoridad": "",
+}
+
+
+def normalizar_campo_dinamico(valor):
+    if not valor:
+        return ""
+    return str(valor).strip().replace("{{", "").replace("}}", "").strip()
+
+
+def obtener_valor_configuracion(configuracion, campo):
+    campo = normalizar_campo_dinamico(campo)
+    if not campo.startswith("configuracion."):
+        return ""
+    if not configuracion:
+        return CONFIGURACION_DEFAULTS.get(campo, "")
+    field_name = campo.split(".", 1)[1]
+    if field_name in {"logo_principal", "logo_secundario", "sello", "firma_autoridad"}:
+        return media_url(getattr(configuracion, field_name, None)) or CONFIGURACION_DEFAULTS.get(campo, "")
+    return getattr(configuracion, field_name, None) or CONFIGURACION_DEFAULTS.get(campo, "")
+
+
+def reemplazar_tokens_configuracion(valor, configuracion):
+    def replace(match):
+        return str(obtener_valor_configuracion(configuracion, match.group(1)) or "")
+    return re.sub(r"\{\{\s*(configuracion\.[^{}\s]+)\s*\}\}", replace, str(valor or ""))
 
 
 CANVAS_WIDTH = 3508
@@ -531,9 +575,13 @@ def normalize_element(key, raw_element, fallback_element):
         "texto": raw.get("texto") or raw.get("text") or raw.get("content") or fallback["texto"],
         "image_url": raw.get("image_url") or raw.get("src") or fallback["image_url"],
         "shape": raw.get("shape") or fallback.get("shape", "rect"),
-        "campo": raw.get("campo") or raw.get("field") or fallback.get("campo", ""),
+        "campo": normalizar_campo_dinamico(raw.get("campo") or raw.get("field") or fallback.get("campo", "")),
         "dynamicType": raw.get("dynamicType") or raw.get("dynamic_type") or fallback.get("dynamicType", ""),
     }
+    if not normalized["campo"]:
+        candidate = normalizar_campo_dinamico(normalized["image_url"] if normalized["type"] == "imagen" else normalized["texto"])
+        if candidate.startswith("configuracion."):
+            normalized["campo"] = candidate
     if normalized["campo"].startswith("configuracion."):
         token = "{{" + normalized["campo"] + "}}"
         normalized["token"] = token
@@ -618,14 +666,16 @@ def resolve_text(text_value, context_map):
     resolved = text_value or ""
     for token, replacement in context_map.items():
         resolved = resolved.replace(token, replacement)
-    return resolved
+    config = getattr(resolve_text, "config", None)
+    return reemplazar_tokens_configuracion(resolved, config)
 
 
 def resolve_image_url(image_value, context_map):
     resolved = image_value or ""
     for token, replacement in context_map.items():
         resolved = resolved.replace(token, replacement)
-    return resolved
+    config = getattr(resolve_image_url, "config", None)
+    return reemplazar_tokens_configuracion(resolved, config)
 
 
 def is_unresolved_token(value):
@@ -660,6 +710,7 @@ def render_text_content(element_key, resolved_text):
 
 def build_token_context_map(*, curso=None, curso_empleado=None, config=None, firmas=None, sample=False):
     config = config if config is not None else ConfiguracionGeneral.get_solo()
+    institution_prefix = obtener_valor_configuracion(config, "configuracion.abreviatura") or ALI_ABREVIATURA
     firmas = firmas if firmas is not None else get_course_signatures(curso)
 
     participante_nombre = "NOMBRE DEL PARTICIPANTE"
@@ -667,7 +718,7 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
     descripcion_curso = getattr(curso, "descripcion", "") or ("Descripción del curso" if sample else "")
     sample_location = getattr(curso, "ubicacion", None)
     sample_location_code = getattr(sample_location, "abreviatura", "") if sample_location else "GRAL"
-    codigo = f"ALI-{sample_location_code or 'GRAL'}-0001-{timezone.now().year}"
+    codigo = f"{institution_prefix}-{sample_location_code or 'GRAL'}-0001-{timezone.now().year}"
     if curso_empleado is not None:
         raw_name = getattr(curso_empleado, "nombre_participante", "") or ""
         participante_nombre = format_participant_name(raw_name)
@@ -678,7 +729,7 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
         except Diploma.DoesNotExist:
             diploma = None
         if diploma and diploma.numero_diploma:
-            codigo = diploma.numero_diploma
+            codigo = diploma.numero_diploma_visible
         else:
             codigo = Diploma.build_numero_diploma(curso_empleado)
     participante_foto = ""
@@ -686,25 +737,20 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
         participante_foto = getattr(curso_empleado, "foto_participante_url", "") or ""
 
     config_values = {
-        "nombre_institucion": config.nombre_institucion if config else "Academia de Liderazgo, Innovación y Desarrollo Personal",
-        "nombre_comercial": config.nombre_comercial if config else "ALI Academy",
-        "abreviatura": config.abreviatura if config else "ALI",
-        "significado_abreviatura": config.significado_abreviatura if config else "Academia de Liderazgo e Innovación",
-        "descripcion": config.descripcion if config else "Con enfoque en desarrollo personal, tecnología e inteligencia artificial.",
-        "slogan": config.slogan if config else "Formamos personas, impulsamos líderes y conectamos con el futuro.",
-        "nombre_autoridad": config.nombre_autoridad if config else "",
-        "cargo_autoridad": config.cargo_autoridad if config else "",
-        "correo": config.correo if config else "",
-        "telefono": config.telefono if config else "",
-        "sitio_web": config.sitio_web if config else "",
-        "direccion": config.direccion if config else "",
+        field.split(".", 1)[1]: obtener_valor_configuracion(config, field)
+        for field in CONFIGURACION_DEFAULTS
+        if field.split(".", 1)[1] not in {"logo_principal", "logo_secundario", "sello", "firma_autoridad"}
     }
     config_images = {
-        "logo_principal": media_url(getattr(config, "logo_principal", None)) if config else "",
-        "logo_secundario": media_url(getattr(config, "logo_secundario", None)) if config else "",
-        "sello": media_url(getattr(config, "sello", None)) if config else "",
-        "firma_autoridad": media_url(getattr(config, "firma_autoridad", None)) if config else "",
+        field.split(".", 1)[1]: obtener_valor_configuracion(config, field)
+        for field in (
+            "configuracion.logo_principal",
+            "configuracion.logo_secundario",
+            "configuracion.sello",
+            "configuracion.firma_autoridad",
+        )
     }
+
 
     context = {
         "{{ participante_nombre }}": participante_nombre,
@@ -731,8 +777,10 @@ def build_token_context_map(*, curso=None, curso_empleado=None, config=None, fir
     }
     for field, value in config_values.items():
         context[f"{{{{ configuracion.{field} }}}}"] = value or ""
+        context[f"{{{{configuracion.{field}}}}}"] = value or ""
     for field, value in config_images.items():
         context[f"{{{{ configuracion.{field} }}}}"] = value or ""
+        context[f"{{{{configuracion.{field}}}}}"] = value or ""
     for index, firma in enumerate(firmas, start=1):
         context[f"{{{{ firma_{index}_nombre }}}}"] = getattr(firma, "nombre", "") or ""
         context[f"{{{{ firma_{index}_cargo }}}}"] = getattr(firma, "rol", "") or ""
@@ -764,7 +812,9 @@ def build_course_design_definition(curso, firmas=None):
     }
 
 
-def build_render_elements(definition, context_map):
+def build_render_elements(definition, context_map, config=None):
+    resolve_text.config = config
+    resolve_image_url.config = config
     render_elements = []
     for element in sorted(definition["elements"].values(), key=lambda item: item["z_index"]):
         item = deepcopy(element)
@@ -815,7 +865,7 @@ def build_diploma_render_context(curso_empleado):
         firmas=firmas,
     )
 
-    render_elements = build_render_elements(definition, context_map)
+    render_elements = build_render_elements(definition, context_map, config=config)
 
     return {
         "curso": curso,

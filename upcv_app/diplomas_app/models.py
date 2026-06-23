@@ -5,6 +5,7 @@ from django.utils import timezone
 
 
 INSTITUTION_CODE = "ALI"
+LEGACY_INSTITUTION_CODE = "UPCV"
 
 ALI_NOMBRE_INSTITUCION = "Academia de Liderazgo, Innovación y Desarrollo Personal"
 ALI_NOMBRE_COMERCIAL = "ALI Academy"
@@ -81,6 +82,19 @@ class ConfiguracionGeneral(models.Model):
         if updated_fields:
             obj.save(update_fields=[*updated_fields, "actualizado"])
         return obj
+
+
+def prefijo_institucional_actual():
+    configuracion = ConfiguracionGeneral.get_solo()
+    return (getattr(configuracion, "abreviatura", "") or ALI_ABREVIATURA).strip().upper() or ALI_ABREVIATURA
+
+
+def codigo_con_prefijo_actual(codigo_original):
+    codigo = str(codigo_original or "").strip()
+    prefijo = prefijo_institucional_actual()
+    if codigo.upper().startswith(f"{LEGACY_INSTITUTION_CODE}-"):
+        return f"{prefijo}-{codigo.split('-', 1)[1]}"
+    return codigo
 
 
 class FraseMotivacional(models.Model):
@@ -280,7 +294,9 @@ class Diploma(models.Model):
 
         location_code = normalize_location_abbreviation(getattr(ubicacion, "abreviatura", "")) or default_location_abbreviation(ubicacion.nombre)
         emission_year = int(year or timezone.now().year)
-        prefix = f"{INSTITUTION_CODE}-{location_code}-"
+        institution_prefix = prefijo_institucional_actual()
+        legacy_prefix = f"{LEGACY_INSTITUTION_CODE}-{location_code}-"
+        prefix = f"{institution_prefix}-{location_code}-"
         suffix = f"-{emission_year}"
 
         with transaction.atomic():
@@ -292,14 +308,15 @@ class Diploma(models.Model):
             max_sequence = 0
             for issued_number in issued_numbers:
                 raw_value = str(issued_number or "").strip().upper()
-                if not raw_value.startswith(prefix) or not raw_value.endswith(suffix):
+                matched_prefix = prefix if raw_value.startswith(prefix) else legacy_prefix if raw_value.startswith(legacy_prefix) else ""
+                if not matched_prefix or not raw_value.endswith(suffix):
                     continue
-                sequence_chunk = raw_value[len(prefix):-len(suffix)]
+                sequence_chunk = raw_value[len(matched_prefix):-len(suffix)]
                 if sequence_chunk.isdigit():
                     max_sequence = max(max_sequence, int(sequence_chunk))
 
             next_sequence = max_sequence + 1
-            return f"{INSTITUTION_CODE}-{location_code}-{str(next_sequence).zfill(4)}-{emission_year}"
+            return f"{institution_prefix}-{location_code}-{str(next_sequence).zfill(4)}-{emission_year}"
 
     @classmethod
     def ensure_for_course_employee(cls, curso_empleado):
@@ -310,6 +327,10 @@ class Diploma(models.Model):
         if diploma is not None:
             return diploma
         return cls.objects.create(curso_empleado=curso_empleado)
+
+    @property
+    def numero_diploma_visible(self):
+        return codigo_con_prefijo_actual(self.numero_diploma)
 
     def save(self, *args, **kwargs):
         if self._state.adding and not self.numero_diploma:
